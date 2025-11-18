@@ -32,6 +32,8 @@ exclude = [
     "postgres_data",
     "minio_data",
     "pgadmin_data",
+    # Exclude EDA notebook from linting
+    "apexai/EDA.ipynb",
 ]
 
 # Line length set to Black's default of 88
