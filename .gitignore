@@ -24,9 +24,6 @@ conf/
 !conf.template/
 !conf
 
-# Dataset directory (tracked separately)
-!datasets/drivingdatasets
-
 # Jupyter notebook checkpoints
 .ipynb_checkpoints/
 
@@ -45,8 +42,8 @@ pgadmin_data/
 minio_data/
 
 # Datasets (large files, download separately)
-datasets/
-!conf.template/data/
+datasets/*
+#!datasets/drivingdatasets_sample/
 
 # Hydra experiment logs
 hydra_experiment_logs/
