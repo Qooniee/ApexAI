@@ -10,8 +10,10 @@ repos:
       # Run the linter
       - id: ruff
         args: [--fix]
+        exclude: ^apexai/EDA\.ipynb$
       # Run the formatter
       - id: ruff-format
+        exclude: ^apexai/EDA\.ipynb$
 
   # Basic file checks
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -37,7 +39,7 @@ repos:
         additional_dependencies:
           - types-PyYAML
           - types-requests
-        exclude: ^(tests/|init_scripts/)
+        exclude: ^(tests/|init_scripts/|apexai/EDA\.ipynb)
 
   # Pytest - Run tests
   - repo: local
