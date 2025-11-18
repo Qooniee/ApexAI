@@ -1,0 +1,35 @@
+# ==============================================
+# Optuna Optimization Configuration
+# ==============================================
+
+# Study Configuration
+study:
+  name: "mlflow_optuna_demo"
+  direction: "minimize"
+  storage_url: ${oc.env:OPTUNA_DB_URL}
+  load_if_exists: true
+
+# Optimization Parameters
+optimization:
+  n_trials: 10
+  timeout: null  # seconds, null for no timeout
+  n_jobs: 1      # parallel jobs
+
+# Pruning Configuration
+pruner:
+  name: "median"
+  n_startup_trials: 5
+  n_warmup_steps: 10
+  interval_steps: 1
+
+# Sampler Configuration
+sampler:
+  name: "tpe"
+  n_startup_trials: 10
+  n_ei_candidates: 24
+  multivariate: true
+
+# Study Management
+cleanup:
+  auto_delete_failed_trials: false
+  max_trials_per_study: 1000

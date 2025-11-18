@@ -1,0 +1,163 @@
+services:
+  # --- データベース ---
+  apexai_db:
+    container_name: apexai_postgres
+    image: postgres:16-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB_MLFLOW}
+      - PGPORT=${DB_INTERNAL_PORT}
+    networks:
+      apexai_net:
+        ipv4_address: ${DB_IP}
+    ports:
+      - "${DB_PORT}:${DB_INTERNAL_PORT}"
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB_MLFLOW} -p ${DB_INTERNAL_PORT}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # --- ML実験/Jupyter環境 (GPU対応) ---
+  apexai_predictor:
+    build:
+      context: .
+      dockerfile: dockerfiles/Dockerfile
+    container_name: apexai_predictor
+    volumes:
+      - ./:/workspace
+    working_dir: /workspace
+    ports:
+      - "${JUPYTER_HOST_PORT}:${JUPYTER_PORT}" # Jupyter Lab
+      - "${STREAMLIT_HOST_PORT}:${STREAMLIT_PORT}" # Streamlit
+    networks:
+      apexai_net:
+        ipv4_address: ${PREDICTOR_IP}
+    tty: true
+    depends_on:
+      apexai_db:
+        condition: service_healthy
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [ gpu ]
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility,graphics
+      # スクリプトから参照するためのDB接続情報
+      - MLFLOW_TRACKING_URI=${MLFLOW_TRACKING_URI}
+      - OPTUNA_DB_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${DB_HOST}:${DB_PORT}/${POSTGRES_DB_OPTUNA}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - POSTGRES_DB_MLFLOW=${POSTGRES_DB_MLFLOW}
+      - POSTGRES_DB_OPTUNA=${POSTGRES_DB_OPTUNA}
+      # MinIO (S3) 設定
+      - MINIO_ROOT_USER=${MINIO_ROOT_USER}
+      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
+      - MINIO_ENDPOINT_URL=${MINIO_ENDPOINT_URL}
+      - MINIO_BUCKET_NAME=${MINIO_BUCKET_NAME}
+      # AWS/S3 互換環境変数（MinIO接続用）
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - MLFLOW_S3_ENDPOINT_URL=${MLFLOW_S3_ENDPOINT_URL}
+    command: >
+      bash -c "source /opt/venv/bin/activate && python apexai_startup_check.py && echo 'ApexAI DB接続確認完了。コンテナを起動状態に保ちます。' && tail -f /dev/null"
+
+  # --- MinIO (ローカルS3互換ストレージ) ---
+  apexai_minio:
+    container_name: apexai_minio
+    image: minio/minio:latest
+    restart: always
+    environment:
+      - MINIO_ROOT_USER=${MINIO_ROOT_USER}
+      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
+    ports:
+      - "${MINIO_HOST_API_PORT}:${MINIO_API_PORT}" # S3 API用
+      - "${MINIO_HOST_CONSOLE_PORT}:${MINIO_CONSOLE_PORT}" # 管理コンソール用
+    networks:
+      apexai_net:
+        ipv4_address: ${MINIO_IP}
+    volumes:
+      - ./minio_data:/data
+    command: server /data --console-address ":${MINIO_CONSOLE_PORT}" --address ":${MINIO_API_PORT}"
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:${MINIO_API_PORT}/minio/health/live" ]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+  # --- MLflow UIサーバー (軽量化) ---
+  apexai_mlflow:
+    image: python:3.12-slim
+    container_name: apexai_mlflow
+    restart: always
+    ports:
+      - "${MLFLOW_HOST_PORT}:${MLFLOW_PORT}"
+    networks:
+      apexai_net:
+        ipv4_address: ${MLFLOW_IP}
+    depends_on:
+      apexai_db:
+        condition: service_healthy
+      apexai_minio:
+        condition: service_healthy
+    # MinIO (ローカルS3) 用の環境変数
+    environment:
+      - AWS_ACCESS_KEY_ID=${MINIO_ROOT_USER}
+      - AWS_SECRET_ACCESS_KEY=${MINIO_ROOT_PASSWORD}
+      - MLFLOW_S3_ENDPOINT_URL=${MINIO_ENDPOINT_URL}
+    command: >
+      sh -c " pip install --no-cache-dir mlflow==3.2.0 psycopg2-binary==2.9.10 boto3==1.40.14 && mlflow server --host 0.0.0.0 --port ${MLFLOW_PORT} --backend-store-uri postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${DB_HOST}:${DB_PORT}/${POSTGRES_DB_MLFLOW} --default-artifact-root s3://${MINIO_BUCKET_NAME}/ "
+
+  # --- Optuna Dashboard (公式軽量イメージ) ---
+  apexai_optuna:
+    image: ghcr.io/optuna/optuna-dashboard:latest
+    container_name: apexai_optuna
+    restart: always
+    ports:
+      - "${OPTUNA_HOST_PORT}:${OPTUNA_PORT}"
+    networks:
+      apexai_net:
+        ipv4_address: ${OPTUNA_IP}
+    depends_on:
+      apexai_db:
+        condition: service_healthy
+    environment:
+      - OPTUNA_DB_URL=postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${DB_HOST}:${DB_PORT}/${POSTGRES_DB_OPTUNA}
+    command: [ "--host", "0.0.0.0", "--port", "${OPTUNA_PORT}", "postgresql+psycopg2://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${DB_HOST}:${DB_PORT}/${POSTGRES_DB_OPTUNA}" ]
+
+  # --- pgAdmin (PostgreSQL管理ツール) ---
+  apexai_pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: apexai_pgadmin
+    restart: always
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_DEFAULT_EMAIL}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_DEFAULT_PASSWORD}
+    ports:
+      - "${PGADMIN_HOST_PORT}:${PGADMIN_PORT}"
+    networks:
+      apexai_net:
+        ipv4_address: ${PGADMIN_IP}
+    depends_on:
+      apexai_db:
+        condition: service_healthy
+    volumes:
+      - ./pgadmin_data:/var/lib/pgadmin
+
+networks:
+  apexai_net:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: ${NETWORK_SUBNET}

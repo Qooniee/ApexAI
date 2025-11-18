@@ -1,0 +1,48 @@
+{
+    "name": "ApexAI MLOps Platform",
+    "dockerComposeFile": ["../docker-compose.yaml"],
+    "service": "apexai_predictor",
+    "workspaceFolder": "/app",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-python.python",
+                "ms-python.vscode-pylance",
+                "ms-python.black-formatter",
+                "ms-toolsai.jupyter",
+                "ms-vscode.vscode-json",
+                "ms-vscode.yaml",
+                "ms-vscode-remote.remote-containers",
+                "ms-azuretools.vscode-docker"
+            ],
+            "settings": {
+                "python.defaultInterpreterPath": "/opt/conda/bin/python",
+                "python.terminal.activateEnvironment": true,
+                "python.formatting.provider": "black",
+                "editor.formatOnSave": true,
+                "terminal.integrated.defaultProfile.linux": "bash",
+                "terminal.integrated.env.linux": {
+                    "PYTHONPATH": "/app/src:/app",
+                    "MLFLOW_TRACKING_URI": "http://apexai_mlflow:5000",
+                    "MINIO_ENDPOINT_URL": "http://apexai_minio:9000"
+                }
+            }
+        }
+    },
+    "forwardPorts": [5001, 8081, 9020, 5051, 8889, 5433],
+    "portsAttributes": {
+        "5001": {"label": "MLflow UI", "protocol": "http"},
+        "8081": {"label": "Optuna Dashboard", "protocol": "http"},
+        "9020": {"label": "MinIO Console", "protocol": "http"},
+        "5051": {"label": "pgAdmin", "protocol": "http"},
+        "8889": {"label": "Jupyter Lab", "protocol": "http"},
+        "5433": {"label": "PostgreSQL Database", "protocol": "tcp"}
+    },
+    "postCreateCommand": "echo '🚀 ApexAI Dev Container Setup Complete!'",
+    "remoteEnv": {
+        "PYTHONPATH": "/app/src:/app",
+        "MLFLOW_TRACKING_URI": "http://apexai_mlflow:5000",
+        "MINIO_ENDPOINT_URL": "http://apexai_minio:9000"
+    },
+    "remoteUser": "root"
+}

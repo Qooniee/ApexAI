@@ -1,0 +1,83 @@
+# ==============================================
+# ML/DL Template - Main Configuration Template
+# ==============================================
+# IMPORTANT: This is a TEMPLATE file.
+# Copy this to conf/config.yaml and customize for your project.
+
+defaults:
+  - model: simple_mlp          # Choose: simple_mlp, resnet, transformer, etc.
+  - training: default          # Choose: default, advanced, distributed
+  - optuna: default            # Choose: default, aggressive, minimal
+  - data: mnist                # Choose: mnist, cifar10, imagenet, custom
+  - _self_
+
+# ==========================================
+# 🎯 EXPERIMENT CONFIGURATION (必須カスタマイズ)
+# ==========================================
+experiment:
+  name: "YOUR_EXPERIMENT_NAME"          # 🔴 必須: 実験名を設定
+  description: "Experiment description" # 🔴 必須: 実験の説明
+  tags: ["baseline", "mnist"]           # 🔴 推奨: タグで実験を分類
+
+# ==========================================
+# 📊 MLFLOW CONFIGURATION
+# ==========================================
+mlflow:
+  tracking_uri: ${oc.env:MLFLOW_TRACKING_URI}  # 環境変数から自動取得
+  experiment_name: ${experiment.name}          # 実験名と連動
+
+# ==========================================
+# 🗂️ OUTPUT AND LOGGING
+# ==========================================
+output_dir: "./hydra_experiment_logs"         # Hydra実験ログディレクトリ
+log_level: "INFO"                             # DEBUG, INFO, WARNING, ERROR
+
+# ==========================================
+# 🎲 REPRODUCIBILITY
+# ==========================================
+seed: 42                                      # ランダムシード（再現性のため）
+
+# ==========================================
+# 💻 DEVICE CONFIGURATION
+# ==========================================
+device: "auto"                               # auto（推奨）, cuda, cpu
+
+# ==========================================
+# ⚙️ HYDRA INTERNAL CONFIGURATION
+# ==========================================
+hydra:
+  run:
+    dir: ${output_dir}/${now:%Y-%m-%d}/${now:%H-%M-%S}
+  job:
+    chdir: false
+
+# ==========================================
+# 🔧 CUSTOMIZATION EXAMPLES
+# ==========================================
+# 以下は参考例です。必要に応じてアンコメント・編集してください：
+
+# # 複数GPU使用の場合
+# distributed:
+#   enabled: true
+#   backend: "nccl"
+#   world_size: 2
+
+# # 追加のメトリクス設定
+# metrics:
+#   log_frequency: 100
+#   save_plots: true
+#   tensorboard: false
+
+# # データ前処理設定
+# preprocessing:
+#   normalize: true
+#   augmentation: false
+#   resize: [224, 224]
+
+# ==========================================
+# 📝 TEMPLATE USAGE NOTES
+# ==========================================
+# 1. experiment.nameとdescriptionは必ずカスタマイズしてください
+# 2. model, training, optuna, dataの選択肢は各ディレクトリ内のファイル名です
+# 3. 環境変数 ${oc.env:VAR_NAME} は自動で .env から読み込まれます
+# 4. コマンドラインで設定を上書き可能: experiment.name="New_Name"

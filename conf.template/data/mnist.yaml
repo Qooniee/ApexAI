@@ -1,0 +1,25 @@
+# ==============================================
+# MNIST Dataset Configuration
+# ==============================================
+
+# Dataset path and download settings
+path: "./datasets/MNIST"        # データセット保存ディレクトリ
+download: true                  # 存在しない場合は自動ダウンロード
+
+# Data transformations
+transforms:
+  - name: "to_tensor"          # PIL Image → Tensor変換
+  - name: "normalize"          # 正規化
+    mean: [0.1307]             # MNIST標準平均値
+    std: [0.3081]              # MNIST標準標準偏差
+
+# Data loading settings
+shuffle:
+  train: true                  # 訓練データをシャッフル
+  test: false                  # テストデータは順序維持
+
+num_workers: 2                 # データローダーのワーカー数（並列処理）
+
+# Dataset split settings (if needed)
+train_split: 1.0               # 訓練データの使用比率
+validation_split: 0.0          # 検証データの分割比率

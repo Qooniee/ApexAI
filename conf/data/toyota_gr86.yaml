@@ -1,0 +1,255 @@
+# ==============================================
+# Sensor Data Configuration
+# ==============================================
+
+# ==========================================
+# 📁 Data Path Configuration
+# ==========================================
+# Unified dataset placement (using datasets/ directory)
+paths:
+  # Base directory (dedicated folder within datasets)
+  base_dir: "./datasets/drivingdatasets"
+
+  # Input data directory
+  input_dir: "${paths.base_dir}/input"
+
+  # Output directory (training results and model save location)
+  output_dir: "${paths.base_dir}/output"
+
+  # Data split directories
+  train_dir: "${paths.input_dir}/train"      # Training data
+  valid_dir: "${paths.input_dir}/valid"      # Validation data
+  test_dir: "${paths.input_dir}/test"        # Test data
+  prediction_dir: "${paths.input_dir}/prediction"  # Prediction data
+
+# ==========================================
+# 🔄 Resampling Configuration
+# ==========================================
+resampling:
+  # Resampling enable flag
+  enabled: true              # true: Resample to 10Hz
+                            # false: Original sampling rate (~23Hz)
+
+  # Target sampling frequency [Hz]
+  target_frequency: 10.0    # 10Hz is sufficient for driving behavior evaluation
+                            # 10Hz = Sample every 0.1 seconds
+
+  # Original sampling frequency [Hz] (VIR data)
+  original_frequency: 23.0  # VIR telemetry is approximately 23Hz
+
+  # Enable anti-aliasing filter
+  anti_aliasing: true       # Prevent aliasing during downsampling
+
+  # Interpolation method
+  interpolation_kind: "linear"  # Linear interpolation (fast and stable)
+                               # Options: "linear", "cubic", "nearest"
+
+
+
+
+
+# ==========================================
+# 📊 Data Loading Parameters
+# ==========================================
+loading:
+  # Batch size (balance between memory usage and learning stability)
+  batch_size: ${training.batch_size}  # Reference from training settings
+
+  # Number of dataloader workers (parallel data loading)
+  num_workers: 0          # Windows: 2-4 recommended, Linux: 4-8 recommended
+                          # More → Faster loading, increased memory consumption
+                          # Less → Memory saving, IO wait occurs
+
+
+  # Dataset persistence (memory efficiency)
+  persistent_workers: false  # Maintain worker processes
+                            # true → Fast, high memory consumption
+                            # false → Memory saving, initialization overhead
+  encoding: "utf-8"         # File encoding
+                            # "utf-8" (standard), "utf-16", "latin1", etc.
+  delimiter: ","           # CSV delimiter
+  header_pos:
+    common: 0               # Header row position for common format
+
+
+
+# ==========================================
+# 🎛️ Data Preprocessing
+# ==========================================
+preprocessing:
+  # Feature selection
+  features:
+    - "pbrake_f"
+    - "pbrake_r"
+    - "Steering_Angle"
+    - "accx_can"
+    - "accy_can"
+    - "ath"
+    - "gear"
+    - "nmot"
+    - "speed"
+
+  # Target label for prediction
+  target_label: "vehicle_label"   # Vehicle identification label column
+
+  # Normalization settings
+  normalization:
+    enabled: true         # Enable normalization
+                          # true: Apply normalization
+                          # false: Use raw data
+
+    method: "minmax"      # Normalization method selection
+                          # "minmax": Min-Max normalization [0, 1] range (with clipping)
+                          # "zscore": Z-Score normalization mean=0, std=1 (±3σ clipping)
+
+    # Parameters for Min-Max normalization
+    min_max:
+      # Features: pbrake_f, pbrake_r, Steering_Angle, accx_can, accy_can, ath, gear, nmot, speed
+      # Values from EDA.ipynb actual data statistics (min and max columns)
+      min: [0.0, 0.0, -467.057242, -2.305603, -3.637093, -16.022081, -1.150162, 0.0, 0.0]
+      max: [180.869085, 182.249066, 466.393638, 2.481207, 1.924832, 112.747288, 6.083910, 7851.806179, 217.203306]
+    
+    # Z-Score normalization parameters
+    zscore:
+      # Set statistics calculated from training data here
+      # Initially set to Null, will be automatically calculated during training
+      mean: null  # Mean of entire training data
+      std: null   # Standard deviation of entire training data
+      clip_sigma: 3.0  # Clipping at ±N standard deviations (outlier countermeasure for production)
+
+
+
+
+# ==========================================
+# 🏷️ Label Configuration
+# ==========================================
+labels:
+  # Number of classes (21 vehicles in VIR dataset)
+  num_classes: 21
+
+  # Vehicle ID to numeric label mapping (VIR Race 1 - Toyota GR86 Cup)
+  vehicle_id_mapping:
+    "GR86-002-2": 0
+    "GR86-006-7": 1
+    "GR86-013-80": 2
+    "GR86-015-31": 3
+    "GR86-016-55": 4
+    "GR86-022-13": 5
+    "GR86-024-41": 6
+    "GR86-026-72": 7
+    "GR86-028-89": 8
+    "GR86-032-15": 9
+    "GR86-033-46": 10
+    "GR86-036-98": 11
+    "GR86-038-93": 12
+    "GR86-040-3": 13
+    "GR86-047-21": 14
+    "GR86-049-88": 15
+    "GR86-051-71": 16
+    "GR86-061-51": 17
+    "GR86-062-012": 18
+    "GR86-063-113": 19
+    "GR86-065-5": 20
+
+  # Class name to ID mapping (Driver/Vehicle identification)
+  class_names:
+    0: "GR86-002-2"
+    1: "GR86-006-7"
+    2: "GR86-013-80"
+    3: "GR86-015-31"
+    4: "GR86-016-55"
+    5: "GR86-022-13"
+    6: "GR86-024-41"
+    7: "GR86-026-72"
+    8: "GR86-028-89"
+    9: "GR86-032-15"
+    10: "GR86-033-46"
+    11: "GR86-036-98"
+    12: "GR86-038-93"
+    13: "GR86-040-3"
+    14: "GR86-047-21"
+    15: "GR86-049-88"
+    16: "GR86-051-71"
+    17: "GR86-061-51"
+    18: "GR86-062-012"
+    19: "GR86-063-113"
+    20: "GR86-065-5"
+
+  # Class weights (imbalanced data countermeasure)
+  class_weights:
+    enabled: false        # Use weighted loss function
+    weights: null         # Auto-computed from data if enabled
+    auto_balance: true    # Automatically set weights inversely proportional to class frequency
+
+
+signal_processing:
+  # Analysis flags (control processing step activation)
+  analysis_flags:
+    doFFT: false              # FFT analysis execution flag
+                              # true: Also use frequency domain features
+                              # false: Use only time domain (recommended)
+    doFilter: true            # Filtering execution flag
+                              # true: Execute noise removal
+                              # false: Use raw data
+    doResample: true          # Resampling execution flag
+                              # true: Unify sampling frequency
+                              # false: Use original frequency
+
+  # Filter settings (noise removal and signal quality improvement)
+  filter:
+    # Filter type
+    type: "butterworth"       # Butterworth filter (standard)
+                              # Options: "butterworth", "chebyshev", "elliptic"
+
+    # Filter order (higher order = steeper characteristics)
+    order: 4                  # 4th order filter (good balance)
+                              # Low order: Gentle characteristics, small phase distortion
+                              # High order: Steep characteristics, large phase distortion
+
+    # Cutoff frequency settings
+    cutoff:
+      low: 0.1                # High-pass filter lower limit (Hz)
+                              # For gravity/DC offset removal
+      high: 5.0               # Low-pass filter upper limit (Hz)
+                              # For high-frequency noise removal
+                              # Human movement is typically 0.5-4Hz
+
+    # Filtering direction
+    forward_backward: true    # Bidirectional filtering
+                              # true: No phase distortion, increased processing time
+                              # false: Fast but phase delay occurs
+
+  # FFT settings (frequency analysis, currently unused)
+  fft:
+    # FFT window size
+    window_size: 256          # Power of 2 recommended (acceleration)
+                              # Large: High frequency resolution, low time resolution
+                              # Small: High time resolution, low frequency resolution
+
+    # Window function
+    window_type: "hanning"    # Hanning window (standard)
+                              # Options: "hanning", "hamming", "blackman"
+
+    # Overlap ratio
+    overlap_ratio: 0.5        # 50% overlap
+                              # High: Smooth analysis, increased computation
+                              # Low: Fast, discontinuities occur
+
+    delta_f: 0.1              # Frequency resolution (Hz)
+                              # Analysis detail setting
+
+  # Resampling settings (unify sampling frequency)
+  resample:
+    # Target sampling frequency
+    target_frequency: 10      # 10Hz (sufficient for movement detection)
+                              # High: Detailed waveform, increased computation
+                              # Low: Fast processing, reduced information
+
+    # Interpolation method
+    interpolation: "linear"   # Linear interpolation (fast and stable)
+                              # Options: "linear", "cubic", "nearest"
+
+    # Anti-aliasing filter
+    anti_aliasing: true       # Prevent aliasing
+                              # true: High quality, increased processing time
+                              # false: Fast, quality degradation risk

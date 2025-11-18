@@ -1,0 +1,159 @@
+# Ruff configuration for ApexAI project
+# More practical ruleset focusing on actual errors and important style issues
+
+# Exclude commonly ignored directories
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".git-rewrite",
+    ".hg",
+    ".ipynb_checkpoints",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".pyenv",
+    ".pytest_cache",
+    ".pytype",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    ".vscode",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "site-packages",
+    "venv",
+    "postgres_data",
+    "minio_data",
+    "pgadmin_data",
+]
+
+# Line length set to Black's default of 88
+line-length = 100
+indent-width = 4
+
+# Target Python 3.12
+target-version = "py312"
+
+[lint]
+# Curated set of "practical" rules for data science/ML projects
+select = [
+    "E",    # pycodestyle (Error)
+    "F",    # Pyflakes (Error)
+    "W",    # pycodestyle (Warning)
+    "I",    # isort (import sorting)
+    "B",    # flake8-bugbear (potential bugs)
+    "UP",   # pyupgrade (modernize Python syntax)
+    "N",    # pep8-naming (naming conventions)
+    "D",    # pydocstyle (Docstring)
+]
+
+# Allow exceptions for rules that are too strict for ML/research code
+ignore = [
+    # Print statements (common in research/debugging)
+    "T201",  # print found
+
+    # Docstring rules (conflicts with Google-style - MUST enable these)
+    "D203",  # 1 blank line required before class docstring (conflicts with D211)
+    "D213",  # Multi-line docstring summary should start at second line (conflicts with D212)
+
+    # Naming conventions (allow ML-specific patterns - RECOMMENDED for ML code)
+    # "N999",  # Invalid module name (allow LSTM.py, GRU.py, etc.)
+    # "N806",  # Variable in function should be lowercase (allow X, y for ML data)
+
+    # Complexity rules (ML models can be complex - RECOMMENDED for complex logic)
+    # "PLR0913",  # too-many-arguments
+    # "PLR0915",  # too-many-statements
+    # "C901",  # function too complex (handled by mccabe with custom limit)
+
+    # Boolean arguments (common in model configurations)
+    # "FBT001",  # boolean-type-hint-positional-argument
+    # "FBT002",  # boolean-default-value-positional-argument
+
+    # Docstring rules (too strict for research code)
+    # "D100",  # Missing docstring in public module
+    # "D104",  # Missing docstring in public package
+    # "D107",  # Missing docstring in __init__
+
+    # Lowercase imported as non-lowercase (allow F for functional)
+    # "N812",  # Already handled in per-file-ignores for informer.py
+
+    # String formatting (too pedantic)
+    # "COM812",  # Missing trailing comma
+    # "COM819",  # Trailing comma prohibited
+    # "ISC001",  # Implicit string concatenation on single line
+    # "ISC002",  # Implicit string concatenation on multiple lines
+    # "Q000",  # Single quotes found
+    # "Q001",  # Single quotes found (multiline)
+    # "Q002",  # Single quotes found (docstring)
+
+    # Indentation (handled by formatter)
+    # "E111",  # Indentation is not a multiple of four
+    # "E114",  # Indentation is not a multiple of four (comment)
+    # "E117",  # Over-indented
+    # "W191",  # Indentation contains tabs
+
+    # NumPy legacy (transitioning gradually)
+    # "NPY002",  # numpy-legacy-random
+
+    # Exception handling (sometimes broad except is necessary)
+    # "BLE001",  # blind-except (allow for robustness in production)
+
+    # Executable permissions (not relevant for Python modules)
+    # "EXE002",  # shebang-missing-executable-file
+
+    # Any type (sometimes necessary for generic code)
+    # "ANN401",  # any-type
+
+    # Unused arguments (common in overridden methods)
+    # "ARG002",  # unused-method-argument
+    # "B007",  # unused-loop-control-variable
+
+    # Magic values (common in ML hyperparameters - RECOMMENDED for ML code)
+    # "PLR2004",  # magic-value-comparison
+]
+
+# Allow auto-fix for all enabled rules
+fixable = ["ALL"]
+unfixable = []
+
+# Allow unused variables when underscore-prefixed
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+# Cyclomatic complexity configuration
+[lint.mccabe]
+max-complexity = 18  # Increased from default 10 for ML code (handles Optuna objective)
+
+# Docstring configuration
+[lint.pydocstyle]
+convention = "google"  # Use Google-style docstrings
+
+# Per-file ignores
+[lint.per-file-ignores]
+"__init__.py" = ["F401", "D104"]  # Allow unused imports and missing docstrings
+"tests/**" = ["D", "T201", "S101", "INP001", "E501"]  # Relaxed rules for tests
+"*_test.py" = ["D", "T201", "S101"]
+"examples/**" = ["T201", "D"]  # Allow print and missing docstrings in examples
+"*.ipynb" = ["D", "T201", "EXE002", "E402", "E501", "B007", "F821"]  # Relaxed rules for notebooks
+# PyTorch functional import convention
+"apexai/models/informer.py" = ["N812"]  # Allow F import for functional
+# Statistical algorithms using conventional variable names (Welford's algorithm)
+"apexai/util/preprocessing.py" = ["N806"]  # Allow M2 (2nd moment in Welford's algorithm)
+# Setup and test scripts in root directory - relaxed rules
+"*_startup_check.py" = ["D", "E501"]
+"setup_*.py" = ["D", "E501", "C901", "SIM102", "F841"]
+"test_*.py" = ["D", "E501", "F841", "B007"]
+"utils/*.py" = ["D", "E501"]
+
+[format]
+# Black-compatible formatting
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"

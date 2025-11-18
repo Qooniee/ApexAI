@@ -1,0 +1,27 @@
+# ==============================================
+# Simple MLP Model Configuration
+# ==============================================
+
+name: "SimpleMLP"
+type: "mlp"
+
+# Model Architecture
+architecture:
+  input_size: 784  # 28x28 for MNIST
+  hidden_size: 128
+  output_size: 10
+  activation: "relu"
+  dropout: 0.0
+
+# Model Parameters for Optuna Optimization
+optuna_params:
+  hidden_size:
+    type: "int"
+    low: 32
+    high: 512
+    step: 32
+  dropout:
+    type: "float"
+    low: 0.0
+    high: 0.5
+    step: 0.1

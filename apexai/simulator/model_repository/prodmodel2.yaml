@@ -1,0 +1,113 @@
+model_id: m-gru-001
+model_path: apexai/simulator/model_repository/GRU.pth
+name: "GRU"
+type: "GRU"  # Model type identifier
+
+# ==========================================
+# 📊 Data Configuration
+# ==========================================
+# Sampling frequency of training data (Hz)
+# Inference must use the same sampling frequency
+sampling_rate: 10  # Hz (0.1 second intervals)
+
+# ==========================================
+# 🔄 TTA Configuration (Test Time Augmentation)
+# ==========================================
+# Number of votes for TTA (number of inference results to collect for majority voting)
+# Inference interval = seq_len / sampling_rate seconds
+# num_votes=6 → Majority voting from 6 independent inference results
+# (With seq_len=100, sampling_rate=10: 10 seconds × 6 times = 60 seconds to collect 6 predictions)
+num_votes: 6  # Majority voting from 6 inference results
+
+# ==========================================
+# 🏷️ Class Names
+# ==========================================
+# Mapping from class ID to vehicle/driver name
+class_names:
+  0: "GR86-002-2"
+  1: "GR86-006-7"
+  2: "GR86-013-80"
+  3: "GR86-015-31"
+  4: "GR86-016-55"
+  5: "GR86-022-13"
+  6: "GR86-024-41"
+  7: "GR86-026-72"
+  8: "GR86-028-89"
+  9: "GR86-032-15"
+  10: "GR86-033-46"
+  11: "GR86-036-98"
+  12: "GR86-038-93"
+  13: "GR86-040-3"
+  14: "GR86-047-21"
+  15: "GR86-049-88"
+  16: "GR86-051-71"
+  17: "GR86-061-51"
+  18: "GR86-062-012"
+  19: "GR86-063-113"
+  20: "GR86-065-5"
+
+# ==========================================
+# 📊 Model Architecture
+# ==========================================
+architecture:
+  # Hidden state dimension of GRU (larger = more expressive, but higher computational cost)
+  hidden_dim: 512
+
+  # Number of stacked GRU layers (deeper = can learn more complex patterns)
+  num_layers: 3
+
+  # Dropout ratio (0.0-1.0, for overfitting prevention, 0 = disabled)
+  dropout_ratio: 0.0
+
+  # Output dimension (must match number of classification classes)
+  out_dim: 21
+
+  # Number of classification classes
+  num_classes: 21
+
+  # Input sequence length
+  seq_len: 100
+
+  # Expected feature dimension
+  feature_size: 9  # pbrake_f, pbrake_r, Steering_Angle, accx_can, accy_can, ath, gear, nmot, speed
+
+  # Classification task flag (true: classification, false: regression)
+  classification: true
+
+  # Batch-first dimension ordering (PyTorch standard format)
+  batch_first: true
+
+
+
+preprocessing:
+  # Selected features to use
+  features:
+    - "pbrake_f"
+    - "pbrake_r"
+    - "Steering_Angle"
+    - "accx_can"
+    - "accy_can"
+    - "ath"
+    - "gear"
+    - "nmot"
+    - "speed"
+
+  # Target label for prediction
+  target_label: "vehicle_label"   # Vehicle identification label column
+
+  # Normalization configuration
+  normalization:
+    enabled: true         # Enable normalization
+                          # true: Apply normalization
+                          # false: Use raw data
+
+    method: "minmax"      # Normalization method selection
+                          # "minmax": Min-Max normalization to [0, 1] range (with clipping)
+                          # "zscore": Z-Score normalization mean=0, std=1 (with ±3σ clipping)
+
+    # Parameters for Min-Max normalization
+    min_max:
+      # Features: pbrake_f, pbrake_r, Steering_Angle, accx_can, accy_can, ath, gear, nmot, speed
+      # Values from EDA.ipynb actual data statistics (min and max columns)
+      min: [0.0, 0.0, -467.057242, -2.305603, -3.637093, -16.022081, -1.150162, 0.0, 0.0]
+      max: [180.869085, 182.249066, 466.393638, 2.481207, 1.924832, 112.747288, 6.083910, 7851.806179, 217.203306]

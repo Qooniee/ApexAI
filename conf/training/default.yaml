@@ -1,0 +1,124 @@
+# ==============================================
+# Training Configuration for ModeDetection
+# ==============================================
+# Purpose: Training settings for time-series sensor data classification tasks
+# Usage: python src/modedetection_main.py training=default
+
+# ==========================================
+# 🎯 Optimizer Configuration
+# ==========================================
+optimizer:
+  # Optimizer algorithm selection
+  name: "adamw"           # AdamW: Improved version of Adam + Weight Decay
+                          # Options: "adam", "sgd", "adamw"
+
+  # Learning rate (important parameter)
+  learning_rate: 0.00039618677904065835
+                          # High → Fast learning but unstable
+                          # Low → Stable but slow learning
+
+  # L2 regularization coefficient (overfitting prevention)
+  weight_decay: 0.0069782812651260325     # 0.01 = 1% weight decay
+                          # High → Strong regularization, simpler model
+                          # Low → Weak regularization, allows complex model
+
+# ==========================================
+# 📈 Learning Rate Scheduler
+# ==========================================
+scheduler:
+  # Scheduler enable flag
+  enabled: false          # true: Dynamically adjust learning rate
+
+  # Scheduler type
+  name: "cosine"          # Cosine decay: Smoothly decrease learning rate
+                          # Options: "step", "cosine", "plateau"
+
+  # Cosine decay settings
+  T_max: 50               # Maximum epochs (when learning rate reaches minimum)
+  eta_min: 1e-6           # Minimum learning rate (lower bound)
+
+# ==========================================
+# 💥 Loss Function
+# ==========================================
+loss:
+  name: "cross_entropy"   # Standard loss function for multi-class classification
+                          # Optimal for predicting class probability distributions
+
+  # Label smoothing (overfitting prevention technique)
+  label_smoothing: 0.0    # 0.0 = disabled, 0.1 = 10% smoothing
+                          # High → Prevents overconfidence, improves generalization
+                          # Low → Prioritizes fitting to training data
+
+# ==========================================
+# 🔄 Training Parameters
+# ==========================================
+# Batch size (trade-off between memory, computational efficiency, and training stability)
+batch_size: 256            # Small to medium sizes are common for time-series data
+                          # Large → Memory efficient, stable gradients
+                          # Small → Memory saving, noisy gradients
+
+# Training epochs
+epochs: 100                # How many times to train on the entire dataset
+                          # Many → Sufficient learning, overfitting risk
+                          # Few → Insufficient learning, underfitting
+
+# Maximum batch limit (for debugging/quick testing)
+max_batches: -1           # -1 = use all data
+                          # Positive value = stop after specified batches
+
+# Gradient accumulation (effectively increases batch size)
+accumulate_grad_batches: 1  # 1 = normal operation
+                           # >1 = accumulate gradients from multiple batches before updating
+
+# Gradient clipping (prevents gradient explosion)
+max_norm: 100              # Maximum gradient norm value
+                          # Clips gradients that are too large to stabilize training
+
+# ==========================================
+# ✅ Validation
+# ==========================================
+validation:
+  enabled: true           # Validation execution flag
+  split_ratio: 0.2        # Data split ratio (20% for validation)
+  frequency: 1            # Validate every N epochs
+
+  # Early stopping settings (overfitting prevention)
+  early_stopping:
+    enabled: true        # Enable early stopping
+    patience: 10          # Number of epochs to wait without performance improvement
+    min_delta: 0.001      # Minimum change to qualify as improvement
+    monitor: "val_accuracy" # Metric to monitor
+    mode: "max"           # max: increasing value is improvement, min: decreasing value is improvement
+
+# ==========================================
+# 💾 Checkpointing
+# ==========================================
+checkpoint:
+  save_best: true         # Save best performing model
+  save_last: true         # Save final epoch model
+  save_top_k: 3           # Keep top k models
+  monitor: "val_accuracy" # Performance criteria metric
+  mode: "max"             # Maximization target
+
+
+
+# ==========================================
+# 📝 Configuration Value Selection Guidelines
+# ==========================================
+# Learning rate (lr):
+#   - 1e-5: Very safe, extremely slow learning
+#   - 1e-4: Recommended lower bound
+#   - 1e-3: Common, good balance
+#   - 1e-2: Fast but unstable risk
+#
+# Batch size:
+#   - 8: Memory saving, noisy gradients
+#   - 16: Recommended size for time-series data
+#   - 32: Balanced type
+#   - 64: Larger, stable gradients
+#
+# Weight decay:
+#   - 1e-5: Almost no regularization effect
+#   - 1e-3: Light regularization
+#   - 1e-2: Moderate regularization (recommended)
+#   - 1e-1: Strong regularization, difficult learning
