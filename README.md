@@ -8,8 +8,8 @@ AI-powered vehicle identification and race analysis using Toyota GR Cup telemetr
 
 ## 1. Overview
 
-  ApexAI is a deep learning platform for identifying vehicles from race telemetry data. 
-  This project is developed for the Hack the Track competition, focusing on vehicle 
+  ApexAI is a deep learning platform for identifying vehicles from race telemetry data.
+  This project is developed for the Hack the Track competition, focusing on vehicle
   classification from time-series sensor data collected during races.
 
 ## 2. Features
@@ -33,7 +33,7 @@ AI-powered vehicle identification and race analysis using Toyota GR Cup telemetr
 
 1. Clone the repository
   ```bash
-  git clone https://github.com/Qooniee/ApexAI.git 
+  git clone https://github.com/Qooniee/ApexAI.git
   ```
   2. Copy .env.templete and rename it to .env
     If you want to change the network settings, change the env file. If not, just copy is OK.
@@ -113,22 +113,108 @@ AI-powered vehicle identification and race analysis using Toyota GR Cup telemetr
 
   ```
   apexai/
-  ├── conf/                    # Hydra configuration files
-  │   ├── config.yaml         # Main configuration
-  │   ├── data/               # Data configurations
-  │   ├── model/              # Model configurations
-  │   └── training/           # Training configurations
-  ├── datasets/               # Data storage
-  │   └── hack_the_track/    # Race telemetry data
-  ├── docs/                   # Documentation
-  │   └── development_plan.md # Detailed development plan
-  ├── src/                    # Source code
-  │   ├── data_generation/   # Data preprocessing
-  │   ├── models/            # Model implementations
-  │   └── engine/            # Training and evaluation
-  ├── dockerfiles/           # Docker configurations
-  ├── init_scripts/          # Database initialization scripts
-  └── setup_apexai.py        # Setup script
+  ├── apexai/                        # Main Python package
+  │   ├── data_generation/          # Automated data pipeline
+  │   │   ├── pipeline.py           # End-to-end pipeline orchestration
+  │   │   ├── preprocess_telemetry.py  # Resampling & lap extraction
+  │   │   ├── generate_training_data.py # X/y file generation
+  │   │   ├── split_dataset.py      # Train/valid/test splitting
+  │   │   └── vir_loader.py         # VIR dataset loader
+  │   ├── models/                   # Neural network architectures
+  │   │   ├── lstm.py               # LSTM model
+  │   │   ├── gru.py                # GRU model
+  │   │   ├── transformer.py        # Transformer model
+  │   │   ├── informer.py           # Informer model
+  │   │   └── model_factory.py      # Dynamic model instantiation
+  │   ├── engine/                   # Training & evaluation logic
+  │   │   ├── train.py              # Training loop
+  │   │   ├── test.py               # Evaluation logic
+  │   │   ├── inference.py          # Inference engine
+  │   │   ├── metrics.py            # Performance metrics
+  │   │   └── make_graph.py         # Visualization utilities
+  │   ├── simulator/                # Real-time inference simulator
+  │   │   ├── frontend/             # Streamlit UI
+  │   │   │   └── app.py            # Web interface
+  │   │   ├── backend/              # Inference engine
+  │   │   │   └── engine.py         # Queue-based streaming inference
+  │   │   └── model_repository/     # ONNX model storage
+  │   ├── util/                     # Utility modules
+  │   │   ├── load_dataset.py       # Dataset loaders
+  │   │   ├── preprocessing.py      # Normalization & transforms
+  │   │   ├── optimization_helpers.py  # BO-NAS parameter suggestion
+  │   │   └── tools.py              # Common utilities
+  │   ├── signal_processing/        # Signal processing utilities
+  │   ├── datasets/                 # Legacy dataset utilities
+  │   ├── model_resistory/          # Model repository utilities
+  │   ├── trainer_entrypoint.py     # Single model training entry point
+  │   ├── optimization_entrypoint.py # HPO/NAS optimization entry point
+  │   └── EDA.ipynb                 # Exploratory data analysis notebook
+  │
+  ├── conf/                         # Hydra configuration files
+  │   ├── config.yaml               # Main configuration
+  │   ├── data/                     # Data configurations
+  │   │   └── toyota_gr86.yaml      # GR86 dataset config
+  │   ├── model/                    # Model architecture configs
+  │   │   ├── gru.yaml              # GRU architecture
+  │   │   ├── lstm.yaml             # LSTM architecture
+  │   │   ├── transformer.yaml      # Transformer architecture
+  │   │   └── informer.yaml         # Informer architecture
+  │   ├── training/                 # Training configurations
+  │   │   └── default.yaml          # Default training config
+  │   └── optuna/                   # Optuna optimization configs
+  │       ├── hpo.yaml              # Hyperparameter optimization
+  │       └── nas.yaml              # Neural architecture search
+  │
+  ├── datasets/                     # Data storage
+  │   ├── rawdata/                  # Raw telemetry CSV files
+  │   │   └── VIR/                  # Virginia International Raceway
+  │   ├── preprocessed_10Hz/        # Resampled lap data (10Hz)
+  │   └── drivingdatasets/          # Training-ready datasets
+  │       └── input/                # Train/valid/test splits
+  │           ├── train/            # Training data
+  │           ├── valid/            # Validation data
+  │           └── test/             # Test data
+  │
+  ├── dockerfiles/                  # Docker configurations
+  │   └── Dockerfile                # Main container definition
+  │
+  ├── init_scripts/                 # Infrastructure initialization
+  │   ├── setup_database.py         # PostgreSQL setup
+  │   ├── setup_mlflow_db.py        # MLflow database setup
+  │   ├── setup_optuna.py           # Optuna study initialization
+  │   ├── setup_minio.py            # MinIO artifact storage setup
+  │   ├── environment_check.py      # Environment validation
+  │   ├── gpu_check.py              # GPU availability check
+  │   ├── health_check.py           # Service health monitoring
+  │   ├── test_experiment.py        # MLflow experiment test
+  │   ├── test_modedetection_integration.py  # Integration test
+  │   ├── 01-create-databases.sh    # Database creation script
+  │   └── wait_for_databases.sh     # Database readiness check
+  │
+  ├── tests/                        # Unit tests
+  │   ├── test_vir_loader.py        # VIR loader tests
+  │   ├── test_preprocessing.py     # Preprocessing tests
+  │   ├── test_resample.py          # Resampling tests
+  │   └── test_filter.py            # Filtering tests
+  │
+  ├── .github/                      # GitHub Actions workflows
+  ├── .devcontainer/                # VS Code devcontainer config
+  ├── hydra_experiment_logs/        # Hydra runtime outputs
+  ├── postgres_data/                # PostgreSQL data volume
+  ├── minio_data/                   # MinIO storage volume
+  ├── pgadmin_data/                 # pgAdmin data volume
+  │
+  ├── docker-compose.yaml           # Docker Compose orchestration
+  ├── pyproject.toml                # Python project metadata & dependencies
+  ├── ruff.toml                     # Ruff linter configuration
+  ├── .pre-commit-config.yaml       # Pre-commit hooks configuration
+  ├── .env.template                 # Environment variable template
+  ├── .gitignore                    # Git ignore rules
+  ├── LICENSE                       # Apache 2.0 License
+  ├── README.md                     # This documentation
+  ├── setup_apexai.py               # One-click infrastructure setup
+  ├── apexai_startup_check.py       # Startup health check script
+  └── analyze_abnormal_laps.py      # Lap anomaly detection utility
 
   ```
 
@@ -155,7 +241,7 @@ AI-powered vehicle identification and race analysis using Toyota GR Cup telemetr
 
 ## 7. Data Pipeline
 
-  ApexAI provides a fully automated data generation pipeline (apexai/data_generation/pipeline.py) that 
+  ApexAI provides a fully automated data generation pipeline (apexai/data_generation/pipeline.py) that
   handles the complete workflow from raw telemetry to training-ready datasets.
 
 ### 7-1. Pipeline Overview
@@ -180,9 +266,11 @@ AI-powered vehicle identification and race analysis using Toyota GR Cup telemetr
 
   Generate training datasets from raw telemetry with a single command:
 
+  ```bash
   python -m apexai.data_generation.pipeline \
     --raw-data-dir datasets/rawdata/VIR \
     --export-dir datasets/drivingdatasets/input
+  ```
 
   This will:
   - Process all race data in datasets/rawdata/VIR/
@@ -198,6 +286,7 @@ AI-powered vehicle identification and race analysis using Toyota GR Cup telemetr
 
   Customize the pipeline behavior with command-line arguments:
 
+  ```bash
   python -m apexai.data_generation.pipeline \
     --raw-data-dir datasets/rawdata/VIR \
     --export-dir datasets/drivingdatasets/input \
@@ -210,6 +299,7 @@ AI-powered vehicle identification and race analysis using Toyota GR Cup telemetr
     --shuffle \
     --random-seed 42 \
     --cleanup
+  ```
 
   Key Parameters:
 
@@ -233,6 +323,7 @@ AI-powered vehicle identification and race analysis using Toyota GR Cup telemetr
 
   After successful execution, the following directory structure will be created:
 
+  ```
   datasets/drivingdatasets/input/
   ├── train/
   │   ├── x_train/          # Training features (589 files for VIR)
@@ -246,16 +337,20 @@ AI-powered vehicle identification and race analysis using Toyota GR Cup telemetr
   │   ├── x_test/           # Test features (154 files)
   │   └── y_test/           # Test labels (154 files)
   └── pipeline_stats.json   # Pipeline execution statistics
+  ```
 
   File naming convention:
+  ```
   {TRACK}_{RACE}_vehicle_{VEHICLE_ID}_lap_{LAP_NUM}_{x|y}_{train|valid|test}.csv
+  ```
 
-  Example: VIR_R1_vehicle_GR86-002-2_lap_001_x_train.csv
+  Example: `VIR_R1_vehicle_GR86-002-2_lap_001_x_train.csv`
 
-  7.5 Pipeline Statistics
+### 7-5. Pipeline Statistics
 
   The pipeline generates pipeline_stats.json with detailed execution metadata:
 
+  ```json
   {
     "raw_data_dir": "datasets/rawdata/VIR",
     "export_dir": "datasets/drivingdatasets/input",
@@ -285,14 +380,16 @@ AI-powered vehicle identification and race analysis using Toyota GR Cup telemetr
       }
     }
   }
+  ```
 
 ### 7-6. Advanced Usage
 
-  Running Individual Pipeline Steps
+#### Running Individual Pipeline Steps
 
   For debugging or custom workflows, you can run each step separately:
 
-  Step 1: Generate resampled lap data
+  **Step 1: Generate resampled lap data**
+  ```python
   from apexai.data_generation.preprocess_telemetry import preprocess_telemetry_to_laps
 
   preprocess_telemetry_to_laps(
@@ -302,8 +399,10 @@ AI-powered vehicle identification and race analysis using Toyota GR Cup telemetr
       original_frequency=23.0,
       use_polars=True,
   )
+  ```
 
-  Step 2: Generate X/y training files
+  **Step 2: Generate X/y training files**
+  ```python
   from apexai.data_generation.generate_training_data import generate_training_files
 
   generate_training_files(
@@ -311,8 +410,10 @@ AI-powered vehicle identification and race analysis using Toyota GR Cup telemetr
       output_dir="datasets/training_dataset_10Hz",
       separate_xy_dirs=True,
   )
+  ```
 
-  Step 3: Split into train/valid/test
+  **Step 3: Split into train/valid/test**
+  ```python
   from apexai.data_generation.split_dataset import (
       get_vehicle_files_from_training,
       split_and_copy_files,
@@ -333,9 +434,11 @@ AI-powered vehicle identification and race analysis using Toyota GR Cup telemetr
       filter_last_lap=True,
       random_seed=42,
   )
+  ```
 
-  Using the Pipeline Programmatically
+#### Using the Pipeline Programmatically
 
+  ```python
   from pathlib import Path
   from apexai.data_generation.pipeline import run_pipeline
 
@@ -354,11 +457,13 @@ AI-powered vehicle identification and race analysis using Toyota GR Cup telemetr
   )
 
   print(f"Generated {pipeline_stats['steps']['step3_split']['split_stats']['train']} training files")
+  ```
 
 ### 7-7. Intermediate Files (Optional Cleanup)
 
   During execution, the pipeline creates intermediate directories:
 
+  ```
   datasets/
   ├── preprocessed_10Hz/
   │   └── VIR/
@@ -366,8 +471,9 @@ AI-powered vehicle identification and race analysis using Toyota GR Cup telemetr
   └── training_dataset_10Hz/
       ├── x_train/         # Intermediate X files
       └── y_train/         # Intermediate y files
+  ```
 
-  Use --cleanup flag to automatically remove these after successful completion.
+  Use `--cleanup` flag to automatically remove these after successful completion.
 
 
 
@@ -869,9 +975,9 @@ Epoch [2/100] - Train Loss: 1.8765, Val Loss: 1.7543, Val F1: 0.8123
 
 ## 10. Real-Time Vehicle ID Inference Simulator
 
-  ApexAI provides a powerful **Streamlit-based real-time inference simulator** that emulates production-grade 
-  vehicle telemetry streaming. 
-  The simulator is designed to replicate real-world scenarios where telemetry data is continuously transmitted 
+  ApexAI provides a powerful **Streamlit-based real-time inference simulator** that emulates production-grade
+  vehicle telemetry streaming.
+  The simulator is designed to replicate real-world scenarios where telemetry data is continuously transmitted
   from race vehicles via streaming platforms like **Apache Kafka**.
 
 ### 10-1. Simulator Overview
@@ -880,38 +986,38 @@ Epoch [2/100] - Train Loss: 1.8765, Val Loss: 1.7543, Val F1: 0.8123
 
   The simulator emulates the following production pipeline:
 
-```
-┌─────────────────┐   ~22Hz CAN bus data   ┌──────────────────────────────────────────┐
-│  Race Vehicle   │ ────────────────────────> │       ApexAI Backend                   │
-│  (Telemetry)    │   Kafka Stream          │                                         │
-└─────────────────┘   (pbrake_f, pbrake_r,  │  ┌────────────────────────────────────┐ │
-                       Steering_Angle, accx, │  │  1. Resampling to 10Hz             │ │
-                       accy, ath, gear,      │  │     (from Kafka messages)          │ │
-                       nmot, speed)          │  └─────────────┬──────────────────────┘ │
-                                             │                ▼                        │
-                                             │  ┌────────────────────────────────────┐ │
-                                             │  │  2. Sliding Window Buffer          │ │
-                                             │  │     (Queue: seq_len=100 samples)   │ │
-                                             │  └─────────────┬──────────────────────┘ │
-                                             │                ▼                        │
-                                             │  ┌────────────────────────────────────┐ │
-                                             │  │  3. Model Inference                │ │
-                                             │  │     (When buffer full: 100 samples)│ │
-                                             │  └─────────────┬──────────────────────┘ │
-                                             │                ▼                        │
-                                             │  ┌────────────────────────────────────┐ │
-                                             │  │  4. TTA Voting Queue               │ │
-                                             │  │     (6-vote buffer)                │ │
-                                             │  └─────────────┬──────────────────────┘ │
-                                             │                ▼                        │
-                                             └────────────────────────────────────────┘
-                                                              │
-                                                              ▼
-                                                    ┌─────────────────┐
-                                                    │  Vehicle ID     │
-                                                    │  Prediction     │
-                                                    └─────────────────┘
-```
+  ```
+  ┌─────────────────┐   ~22Hz CAN bus data   ┌──────────────────────────────────────────┐
+  │  Race Vehicle   │ ────────────────────────> │       ApexAI Backend                   │
+  │  (Telemetry)    │   Kafka Stream          │                                         │
+  └─────────────────┘   (pbrake_f, pbrake_r,  │  ┌────────────────────────────────────┐ │
+                         Steering_Angle, accx, │  │  1. Resampling to 10Hz             │ │
+                         accy, ath, gear,      │  │     (from Kafka messages)          │ │
+                         nmot, speed)          │  └─────────────┬──────────────────────┘ │
+                                               │                ▼                        │
+                                               │  ┌────────────────────────────────────┐ │
+                                               │  │  2. Sliding Window Buffer          │ │
+                                               │  │     (Queue: seq_len=100 samples)   │ │
+                                               │  └─────────────┬──────────────────────┘ │
+                                               │                ▼                        │
+                                               │  ┌────────────────────────────────────┐ │
+                                               │  │  3. Model Inference                │ │
+                                               │  │     (When buffer full: 100 samples)│ │
+                                               │  └─────────────┬──────────────────────┘ │
+                                               │                ▼                        │
+                                               │  ┌────────────────────────────────────┐ │
+                                               │  │  4. TTA Voting Queue               │ │
+                                               │  │     (6-vote buffer)                │ │
+                                               │  └─────────────┬──────────────────────┘ │
+                                               │                ▼                        │
+                                               └────────────────────────────────────────┘
+                                                                │
+                                                                ▼
+                                                      ┌─────────────────┐
+                                                      │  Vehicle ID     │
+                                                      │  Prediction     │
+                                                      └─────────────────┘
+  ```
 
   **Design Philosophy:**
   - **Queue-based buffering**: Incoming telemetry samples are stored in a sliding window queue
@@ -923,7 +1029,7 @@ Epoch [2/100] - Train Loss: 1.8765, Val Loss: 1.7543, Val F1: 0.8123
 
   The VIR (Virginia International Raceway) dataset used in ApexAI was originally collected with **Kafka streaming infrastructure**:
 
-  ```yaml
+  ```
   # Original data collection setup (GR86 Cup Race)
   CAN Bus (Vehicle) → Kafka Producer → Kafka Topic (telemetry_stream)
                                             ↓
@@ -1084,47 +1190,47 @@ class DataStreamer:
 
 **Fixed-Interval Inference** (Production Pattern):
 
-```python
-def process_next_sample():
-    """Main streaming loop - runs at 10Hz."""
-    # 1. Poll next message from stream (Kafka consumer)
-    sample = st.session_state.streamer.get_next_sample()
+  ```python
+  def process_next_sample():
+      """Main streaming loop - runs at 10Hz."""
+      # 1. Poll next message from stream (Kafka consumer)
+      sample = st.session_state.streamer.get_next_sample()
 
-    # 2. Add to queue buffer
-    st.session_state.buffer.add_sample(sample)
+      # 2. Add to queue buffer
+      st.session_state.buffer.add_sample(sample)
 
-    # 3. Check if buffer is ready for inference
-    if st.session_state.buffer.is_ready():
-        sequence = st.session_state.buffer.get_sequence()
+      # 3. Check if buffer is ready for inference
+      if st.session_state.buffer.is_ready():
+          sequence = st.session_state.buffer.get_sequence()
 
-        # 4. Run model inference
-        predicted_class, probabilities = engine.predict(sequence)
+          # 4. Run model inference
+          predicted_class, probabilities = engine.predict(sequence)
 
-        # 5. Add to TTA voting buffer (secondary queue)
-        st.session_state.tta.add_prediction(predicted_class)
+          # 5. Add to TTA voting buffer (secondary queue)
+          st.session_state.tta.add_prediction(predicted_class)
 
-        # 6. Clear buffer (prepare for next window)
-        st.session_state.buffer.clear()
+          # 6. Clear buffer (prepare for next window)
+          st.session_state.buffer.clear()
 
-    # 7. Advance time (0.1s = 10Hz)
-    st.session_state.elapsed_time += 0.1
-```
+      # 7. Advance time (0.1s = 10Hz)
+      st.session_state.elapsed_time += 0.1
+  ```
 
 **Timing Diagram:**
-```
-Time (s)  | Action                        | Buffer State  | Inference
-----------|-------------------------------|---------------|----------
-0.0       | Sample 1 arrives (Kafka msg) | 1/100        | Waiting
-0.1       | Sample 2 arrives              | 2/100        | Waiting
-...       | ...                           | ...          | ...
-9.9       | Sample 100 arrives            | 100/100      | ✓ Ready!
-10.0      | Inference #1 runs             | Cleared      | Running
-10.0      | Sample 101 arrives            | 1/100        | Waiting
-10.1      | Sample 102 arrives            | 2/100        | Waiting
-...       | ...                           | ...          | ...
-19.9      | Sample 200 arrives            | 100/100      | ✓ Ready!
-20.0      | Inference #2 runs             | Cleared      | Running
-```
+  ```
+  Time (s)  | Action                        | Buffer State  | Inference
+  ----------|-------------------------------|---------------|----------
+  0.0       | Sample 1 arrives (Kafka msg) | 1/100        | Waiting
+  0.1       | Sample 2 arrives              | 2/100        | Waiting
+  ...       | ...                           | ...          | ...
+  9.9       | Sample 100 arrives            | 100/100      | ✓ Ready!
+  10.0      | Inference #1 runs             | Cleared      | Running
+  10.0      | Sample 101 arrives            | 1/100        | Waiting
+  10.1      | Sample 102 arrives            | 2/100        | Waiting
+  ...       | ...                           | ...          | ...
+  19.9      | Sample 200 arrives            | 100/100      | ✓ Ready!
+  20.0      | Inference #2 runs             | Cleared      | Running
+  ```
 
 ### 10-4. Model Configuration Files
 
@@ -1201,7 +1307,7 @@ preprocessing:
     # Min-Max values from training data statistics (EDA.ipynb)
     # CRITICAL: These values MUST match the normalization used during model training
     # Otherwise, inference predictions will be incorrect!
-    min: [-6.661150, -6.551976, -467.057242, -2.305603, -3.637093, -16.022081, -1.150162, -11.439571, -0.478419]
+    min: [0.0, 0.0, -467.057242, -2.305603, -3.637093, -16.022081, -1.150162, 0.0, 0.0]
     max: [180.869085, 182.249066, 466.393638, 2.481207, 1.924832, 112.747288, 6.083910, 7851.806179, 217.203306]
 
 # ==========================================
@@ -1306,27 +1412,27 @@ Three real-time plots (updates every 1 second):
 #### 10-6-1. Single Model + TTA
 
 **How it works (with queue buffering):**
-```python
-# Streaming Loop @ 10Hz:
-1. Poll next Kafka message (CSV row)
-2. Enqueue sample to sliding window buffer (FIFO queue, maxlen=100)
-3. When queue full (100 samples) → Run inference
-4. Add prediction to TTA vote queue (maxlen=6)
-5. When 6 votes collected → Majority vote = Final prediction
-6. Clear window buffer, continue streaming
-```
+  ```python
+  # Streaming Loop @ 10Hz:
+  1. Poll next Kafka message (CSV row)
+  2. Enqueue sample to sliding window buffer (FIFO queue, maxlen=100)
+  3. When queue full (100 samples) → Run inference
+  4. Add prediction to TTA vote queue (maxlen=6)
+  5. When 6 votes collected → Majority vote = Final prediction
+  6. Clear window buffer, continue streaming
+  ```
 
 **Example Timeline:**
-```
-Time 0.0s: Queue filling... (0/100 samples in buffer)
-Time 9.9s: Queue full (100/100) → Predict: GR86-002-2 (Vote 1/6)
-         → Clear buffer, resume streaming
-Time 10.0s: New queue (1/100) → Wait...
-Time 19.9s: Queue full (100/100) → Predict: GR86-002-2 (Vote 2/6)
-Time 29.9s: Queue full (100/100) → Predict: GR86-006-7 (Vote 3/6)
-...
-Time 59.9s: 6 votes collected → Final: GR86-002-2 (4/6 votes)
-```
+  ```
+  Time 0.0s: Queue filling... (0/100 samples in buffer)
+  Time 9.9s: Queue full (100/100) → Predict: GR86-002-2 (Vote 1/6)
+           → Clear buffer, resume streaming
+  Time 10.0s: New queue (1/100) → Wait...
+  Time 19.9s: Queue full (100/100) → Predict: GR86-002-2 (Vote 2/6)
+  Time 29.9s: Queue full (100/100) → Predict: GR86-006-7 (Vote 3/6)
+  ...
+  Time 59.9s: 6 votes collected → Final: GR86-002-2 (4/6 votes)
+  ```
 
 **Queue Benefits:**
 - **Decouples streaming from inference**: Buffer absorbs rate variations
@@ -1337,70 +1443,70 @@ Time 59.9s: 6 votes collected → Final: GR86-002-2 (4/6 votes)
 #### 10-6-2. Multi-Model Ensemble + TTA
 
 **How it works:**
-```python
-# Streaming Loop @ 10Hz:
-1. Poll next Kafka message
-2. Enqueue to shared sliding window buffer (seq_len=100)
-3. When buffer full:
-   - Model 1 (Transformer) → Prediction A (from buffered sequence)
-   - Model 2 (GRU) → Prediction B (from same buffered sequence)
-4. Add both predictions to ensemble vote queue (6 per model = 12 total)
-5. When 12 votes collected:
-   - Majority voting: Combine all votes
-   - Weighted voting: Weight by model confidence
-6. Final prediction = Ensemble result
-7. Clear buffer, continue streaming
-```
+  ```python
+  # Streaming Loop @ 10Hz:
+  1. Poll next Kafka message
+  2. Enqueue to shared sliding window buffer (seq_len=100)
+  3. When buffer full:
+     - Model 1 (Transformer) → Prediction A (from buffered sequence)
+     - Model 2 (GRU) → Prediction B (from same buffered sequence)
+  4. Add both predictions to ensemble vote queue (6 per model = 12 total)
+  5. When 12 votes collected:
+     - Majority voting: Combine all votes
+     - Weighted voting: Weight by model confidence
+  6. Final prediction = Ensemble result
+  7. Clear buffer, continue streaming
+  ```
 
 **Ensemble Methods:**
 
 **Majority Voting:**
-- Each model gets equal weight
-- Final prediction = Most voted class across all buffered predictions
-- Simple and robust
+  - Each model gets equal weight
+  - Final prediction = Most voted class across all buffered predictions
+  - Simple and robust
 
 **Weighted Voting:**
-- Predictions weighted by confidence scores
-- Final prediction = Highest weighted sum
-- Better when models have different reliability
+  - Predictions weighted by confidence scores
+  - Final prediction = Highest weighted sum
+  - Better when models have different reliability
 
 **Example:**
-```
-Time 59.9s (after 6 inference cycles):
-  Model 1 (Transformer): [GR86-002-2: 4 votes, GR86-006-7: 2 votes]
-  Model 2 (GRU):         [GR86-002-2: 5 votes, GR86-015-31: 1 vote]
+  ```
+  Time 59.9s (after 6 inference cycles):
+    Model 1 (Transformer): [GR86-002-2: 4 votes, GR86-006-7: 2 votes]
+    Model 2 (GRU):         [GR86-002-2: 5 votes, GR86-015-31: 1 vote]
 
-  Majority Ensemble: GR86-002-2 (9/12 votes = 75%)
-  Model Agreement: 83.3% (5/6 buffered predictions agreed)
-```
+    Majority Ensemble: GR86-002-2 (9/12 votes = 75%)
+    Model Agreement: 83.3% (5/6 buffered predictions agreed)
+  ```
 
 ### 10-7. Preparing Test Data
 
 #### 10-7-1. Extract Test Files from Pipeline Output
 
-After running the data pipeline (Section 7), you'll have test files:
+  After running the data pipeline (Section 7), you'll have test files:
 
-```bash
-datasets/drivingdatasets/input/test/x_test/
-├── VIR_R1_vehicle_GR86-002-2_lap_001_x_test.csv  # Historical Kafka data
-├── VIR_R1_vehicle_GR86-002-2_lap_002_x_test.csv
-├── VIR_R1_vehicle_GR86-006-7_lap_001_x_test.csv
-└── ... (154 total test files from Kafka stream recordings)
-```
+  ```bash
+  datasets/drivingdatasets/input/test/x_test/
+  ├── VIR_R1_vehicle_GR86-002-2_lap_001_x_test.csv  # Historical Kafka data
+  ├── VIR_R1_vehicle_GR86-002-2_lap_002_x_test.csv
+  ├── VIR_R1_vehicle_GR86-006-7_lap_001_x_test.csv
+  └── ... (154 total test files from Kafka stream recordings)
+  ```
 
-Use any of these files in the simulator (they represent historical Kafka stream data).
+  Use any of these files in the simulator (they represent historical Kafka stream data).
 
 #### 10-7-2. Create Prediction Data (Optional)
 
-Generate new test data from raw telemetry:
+  Generate new test data from raw telemetry:
 
-```bash
-python -m apexai.data_generation.pipeline \
-  --raw-data-dir datasets/rawdata/VIR \
-  --export-dir datasets/drivingdatasets/input
-```
+  ```bash
+  python -m apexai.data_generation.pipeline \
+    --raw-data-dir datasets/rawdata/VIR \
+    --export-dir datasets/drivingdatasets/input
+  ```
 
-Then copy files from `test/x_test/` to test in simulator.
+  Then copy files from `test/x_test/` to test in simulator.
 
 ### 10-8. Exporting Trained Models for Simulator
 
@@ -1413,126 +1519,125 @@ Then copy files from `test/x_test/` to test in simulator.
 
 #### 10-8-2. From Optuna Top-K Models
 
-After NAS/HPO completion, Top-K models are saved in MLflow:
+  After NAS/HPO completion, Top-K models are saved in MLflow:
 
-```bash
-# Find Top-1 model run in MLflow UI
-# Download artifact: models/trial_127_rank_1.pth
-# Place at: apexai/simulator/model_repository/models/transformer_trial127.pth
-```
+  ```bash
+  # Find Top-1 model run in MLflow UI
+  # Download artifact: models/trial_127_rank_1.pth
+  # Place at: apexai/simulator/model_repository/models/transformer_trial127.pth
+  ```
 
 #### 10-8-3. Update Config File
 
-Create corresponding YAML config with matching architecture:
+  Create corresponding YAML config with matching architecture:
 
-```yaml
-# Must match training configuration exactly
-model_path: "apexai/simulator/model_repository/models/transformer_trial127.pth"
-architecture:
-  seq_len: 100         # Must match queue buffer size
-  hidden_dim: 448      # From Optuna best trial
-  num_layers: 3
-  num_heads: 8
-  feedforward_multiplier: 4
-  dropout_ratio: 0.1
-  num_classes: 21
-  # ... (all other params from trial)
+  ```yaml
+  # Must match training configuration exactly
+  model_path: "apexai/simulator/model_repository/models/transformer_trial127.pth"
+  architecture:
+    seq_len: 100         # Must match queue buffer size
+    hidden_dim: 448      # From Optuna best trial
+    num_layers: 3
+    num_heads: 8
+    feedforward_multiplier: 4
+    dropout_ratio: 0.1
+    num_classes: 21
+    # ... (all other params from trial)
 
-preprocessing:
-  normalization:
-    enabled: true
-    method: "minmax"
-    # CRITICAL: Use exact same normalization values as training!
-    min: [-6.661150, -6.551976, -467.057242, -2.305603, -3.637093, -16.022081, -1.150162, -11.439571, -0.478419]
-    max: [180.869085, 182.249066, 466.393638, 2.481207, 1.924832, 112.747288, 6.083910, 7851.806179, 217.203306]
-```
+  preprocessing:
+    normalization:
+      enabled: true
+      method: "minmax"
+      # CRITICAL: Use exact same normalization values as training!
+      min: [0.0, 0.0, -467.057242, -2.305603, -3.637093, -16.022081, -1.150162, 0.0, 0.0]
+      max: [180.869085, 182.249066, 466.393638, 2.481207, 1.924832, 112.747288, 6.083910, 7851.806179, 217.203306]
+  ```
 
 **⚠️ CRITICAL: Normalization Parameter Consistency**
 
-The normalization parameters (`min`, `max`) **MUST match exactly** between training and inference:
+  The normalization parameters (`min`, `max`) **MUST match exactly** between training and inference:
 
-1. **Where to find training normalization values:**
-   - Check `conf/data/toyota_gr86.yaml` used during training
-   - Or refer to `EDA.ipynb` where statistics were calculated
-   - MLflow run parameters may also contain normalization info
+  1. **Where to find training normalization values:**
+     - Check `conf/data/toyota_gr86.yaml` used during training
+     - Or refer to `EDA.ipynb` where statistics were calculated
+     - MLflow run parameters may also contain normalization info
 
-2. **Why this matters:**
-   ```python
-   # Training: x_normalized = (x - min) / (max - min)
-   # If inference uses different min/max:
-   # → Model receives different input distribution
-   # → Predictions will be completely wrong!
-   ```
+  2. **Why this matters:**
+     ```python
+     # Training: x_normalized = (x - min) / (max - min)
+     # If inference uses different min/max:
+     # → Model receives different input distribution
+     # → Predictions will be completely wrong!
+     ```
 
-3. **How to verify:**
-   ```python
-   # Test normalization consistency
-   import numpy as np
+  3. **How to verify:**
+     ```python
+     # Test normalization consistency
+     import numpy as np
 
-   sample = np.array([0.0, 0.0, 15.3, 0.45, -0.12, 35.2, 3, 5200, 85.3])
-   min_vals = np.array([-6.661150, -6.551976, -467.057242, -2.305603,
-                        -3.637093, -16.022081, -1.150162, -11.439571, -0.478419])
-   max_vals = np.array([180.869085, 182.249066, 466.393638, 2.481207,
-                        1.924832, 112.747288, 6.083910, 7851.806179, 217.203306])
+     sample = np.array([0.0, 0.0, 15.3, 0.45, -0.12, 35.2, 3, 5200, 85.3])
+     min_vals = np.array([0.0, 0.0, -467.057242, -2.305603,
+                          -3.637093, -16.022081, -1.150162, 0.0, 0.0])
+     max_vals = np.array([180.869085, 182.249066, 466.393638, 2.481207,
+                          1.924832, 112.747288, 6.083910, 7851.806179, 217.203306])
 
-   normalized = (sample - min_vals) / (max_vals - min_vals)
-   print(f"Normalized sample: {normalized}")
-   # Should be in range [0, 1] for all features
-   ```
+     normalized = (sample - min_vals) / (max_vals - min_vals)
+     print(f"Normalized sample: {normalized}")
+     # Should be in range [0, 1] for all features
+     ```
 
-4. **Common mistakes:**
-   - Using default values instead of training statistics
-   - Calculating new min/max from test data (causes distribution shift)
-   - Forgetting to enable normalization (`enabled: true`)
-   - Using wrong normalization method (`minmax` vs `zscore`)
+  4. **Common mistakes:**
+     - Using default values instead of training statistics
+     - Calculating new min/max from test data (causes distribution shift)
+     - Forgetting to enable normalization (`enabled: true`)
+     - Using wrong normalization method (`minmax` vs `zscore`)
 
-5. **Best practice:**
-   - Save normalization parameters with model during training
-   - Document min/max values in MLflow run
-   - Version control your config files
-   - Test inference with known samples before deployment
-```
+  5. **Best practice:**
+     - Save normalization parameters with model during training
+     - Document min/max values in MLflow run
+     - Version control your config files
+     - Test inference with known samples before deployment
 
 
 ## Troubleshooting
 
 ### Services Not Starting
 
-Check service status:
-```bash
-docker-compose ps
-```
+  Check service status:
+  ```bash
+  docker-compose ps
+  ```
 
-View logs for a specific service:
-```bash
-docker-compose logs [service_name]
-```
+  View logs for a specific service:
+  ```bash
+  docker-compose logs [service_name]
+  ```
 
-Restart all services:
-```bash
-docker-compose down
-docker-compose up -d
-```
+  Restart all services:
+  ```bash
+  docker-compose down
+  docker-compose up -d
+  ```
 
 ### GPU Not Detected
 
-Verify NVIDIA driver:
-```bash
-nvidia-smi
-```
+  Verify NVIDIA driver:
+  ```bash
+  nvidia-smi
+  ```
 
-Verify Docker GPU support:
-```bash
-docker run --rm --gpus all nvidia/cuda:12.8.0-base-ubuntu22.04 nvidia-smi
-```
+  Verify Docker GPU support:
+  ```bash
+  docker run --rm --gpus all nvidia/cuda:12.8.0-base-ubuntu22.04 nvidia-smi
+  ```
 
 ### Database Connection Issues
 
-Reset databases:
-```bash
-docker-compose down -v
-python setup_apexai.py
-```
+  Reset databases:
+  ```bash
+  docker-compose down -v
+  python setup_apexai.py
+  ```
 
 ## License
 
