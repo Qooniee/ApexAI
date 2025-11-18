@@ -1,0 +1,39 @@
+# ==============================================
+# GRU Model Configuration for ModeDetection
+# ==============================================
+# Purpose: GRU model settings for classifying transportation modes from smartphone sensor data
+# Usage: python src/modedetection_main.py model=gru
+
+name: "GRU"
+type: "GRU"  # Model type identifier
+
+# ==========================================
+# 📊 Model Architecture
+# ==========================================
+architecture:
+  # GRU hidden state dimension (higher = more expressive but more compute cost)
+  hidden_dim: 256
+
+  # Number of stacked GRU layers (deeper = can learn more complex patterns)
+  num_layers: 4
+
+  # Dropout rate (0.0-1.0, for overfitting prevention, 0 disables)
+  dropout_ratio: 0.3
+
+  # Output dimension (must match number of classification classes)
+  out_dim: 21
+
+  # Number of classification classes
+  num_classes: 21
+
+  # Input sequence length
+  seq_len: 100
+
+  # Expected feature dimension
+  feature_size: 9 # pbrake_f, pbrake_r, Steering_Angle, accx_can, accy_can, ath, gear, nmot, speed
+
+  # Classification task flag (true: classification, false: regression)
+  classification: true
+
+  # Batch dimension first (PyTorch standard format)
+  batch_first: true

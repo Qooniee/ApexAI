@@ -1,0 +1,72 @@
+# ==============================================
+# ApexAI - Driver Identification Platform
+# ==============================================
+
+defaults:
+  - model: gru
+  - training: default
+  - optuna: gru_hpo
+  - data: toyota_gr86
+  - _self_
+
+# ==========================================
+# 🎯 EXPERIMENT CONFIGURATION
+# ==========================================
+experiment:
+  name: "ApexAI_Driver_Identification_GRU_Tune"
+  description: "Driver identification from race telemetry data using deep learning"
+  tags: ["time_series", "classification", "apexai", "mlops", "driver_identification"]
+
+# ==========================================
+# 📊 MLFLOW CONFIGURATION
+# ==========================================
+mlflow:
+  tracking_uri: ${oc.env:MLFLOW_TRACKING_URI}
+  experiment_name: ${experiment.name}
+  # Artifact storage settings
+  artifact_location: "s3://apexai-models/experiments/"  # MinIO S3 bucket
+  # Run name convention
+  run_name_template: "ApexAI_${model.name}_${now:%Y%m%d_%H%M%S}"
+  # Auto-tagging settings
+  auto_tags:
+    project: "ApexAI"
+    platform: "driver_identification"
+    data_type: "race_telemetry"
+
+# ==========================================
+# 🗂️ OUTPUT AND LOGGING
+# ==========================================
+output_dir: "./hydra_experiment_logs"
+log_level: "INFO"
+
+# ==========================================
+# 🎲 REPRODUCIBILITY
+# ==========================================
+seed: 42
+
+# ==========================================
+# 💻 DEVICE CONFIGURATION
+# ==========================================
+device: "auto"
+
+# ==========================================
+# 📁 DATA PATH CONFIGURATION (Unified)
+# ==========================================
+data_paths:
+  base_dir: "./datasets/drivingdatasets"
+  input_dir: "${data_paths.base_dir}/input"
+  output_dir: "${data_paths.base_dir}/output"
+  train_dir: "${data_paths.input_dir}/train"
+  valid_dir: "${data_paths.input_dir}/valid"
+  test_dir: "${data_paths.input_dir}/test"
+  prediction_dir: "${data_paths.input_dir}/prediction"
+
+
+# ==========================================
+# ⚙️ HYDRA INTERNAL CONFIGURATION
+# ==========================================
+hydra:
+  run:
+    dir: ${output_dir}/${now:%Y-%m-%d}/${now:%H-%M-%S}
+  job:
+    chdir: false

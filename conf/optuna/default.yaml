@@ -1,0 +1,237 @@
+# ==============================================
+# Optuna Optimization Configuration for ModeDetection
+# ==============================================
+# Purpose: Improve model performance through automatic hyperparameter optimization
+# Usage: python src/modedetection_main.py optuna=default
+
+# ==========================================
+# 📊 Study Configuration
+# ==========================================
+study:
+  # Optimization study name (unique within database)
+  name: "ApexAI_HPO_${model.name}_w/Norm_f1Maximize_feature9_v10"  # F1 score maximization version
+
+  # Optimization direction
+  direction: "maximize"     # Maximize objective function
+                           # "minimize": For loss, error (lower is better)
+                           # "maximize": For accuracy, f1_score (higher is better)
+
+  # Database connection URL (using PostgreSQL)
+  storage_url: "postgresql://${oc.env:POSTGRES_USER}:${oc.env:POSTGRES_PASSWORD}@${oc.env:DB_HOST}:${oc.env:DB_PORT}/${oc.env:POSTGRES_DB_OPTUNA}"
+
+  # Existing study load setting
+  load_if_exists: true     # true: Continue existing study
+                           # false: Create new study (existing is deleted)
+
+# ==========================================
+# 🔍 Optimization Parameters
+# ==========================================
+optimization:
+  # Number of trials (large value with timeout priority)
+  n_trials: 1000         # Large value (stops automatically when timeout is reached)
+                          # Long-term optimization for RTX3070
+
+  # Maximum execution time (seconds) - Optimized for RTX3070
+  timeout: 36000          # 10 hours = 36000 seconds
+                          # Long execution for NAS (recommended for overnight/weekend runs)
+
+  # Parallel execution count - Optimized for RTX3070 8GB
+  n_jobs: 1               # RTX3070 8GB: Optimal with 2 parallel processes
+                          # GPU usage: ~6-7GB (with safety margin)
+
+# ==========================================
+# ✂️ Pruning Configuration
+# ==========================================
+# Purpose: Early terminate unpromising trials to save computation time
+pruner:
+  # Pruning algorithm type
+  name: "median"          # Median-based pruning
+                          # "median": Terminate trials below median
+                          # "hyperband": More aggressive pruning
+                          # "none": No pruning (complete all trials)
+
+  # Number of trials before starting pruning
+  n_startup_trials: 5     # Don't prune first 5 trials
+                          # Minimum samples needed to establish pruning criteria
+
+  # Number of warmup steps
+  n_warmup_steps: 3       # Don't judge pruning for first 3 epochs
+                          # Avoid initial unstable learning
+
+  # Pruning judgment interval
+  interval_steps: 1       # Judge pruning every 1 epoch
+                          # Frequent → Early detection, computation overhead
+                          # Rare → Miss risk, low overhead
+
+# ==========================================
+# 🎯 Sampler Configuration
+# ==========================================
+# Purpose: Select efficient hyperparameter search strategy
+sampler:
+  # Sampling algorithm
+  name: "tpe"             # Tree-structured Parzen Estimator
+                          # "tpe": Bayesian optimization, efficient using history
+                          # "random": Random search, baseline
+                          # "grid": Grid search, try all combinations
+
+  # TPE-specific settings
+  n_startup_trials: 8     # Number of random trials (before TPE starts)
+                          # Initial data collection period for TPE
+
+  # Expected Improvement candidates
+  n_ei_candidates: 24     # Number of candidates for expected improvement calculation
+                          # More → Precise search, increased computation time
+                          # Less → Fast, rough search
+
+  # Use multivariate TPE flag
+  multivariate: false      # Consider correlations between parameters
+                          # true: Utilize correlations, high accuracy
+                          # false: Treat independently, simple
+
+# ==========================================
+# 🔬 Advanced Settings
+# ==========================================
+advanced:
+  # Multi-objective optimization (normally single objective)
+  multi_objective: false  # false: Single metric optimization
+                          # true: Multiple metrics simultaneous optimization
+
+  # Metrics for multi-objective case
+  objectives:
+    - "accuracy"          # Accuracy
+    - "f1_score"          # F1 Score
+
+  # Use conditional parameters
+  conditional_params: false # Conditional branching by model type
+
+  # Parameters fixed across entire experiment
+  fixed_params:
+    seed: 42              # Ensure reproducibility
+    device: "cuda"        # Force GPU usage
+
+# ==========================================
+# 💾 Model Saving Configuration
+# ==========================================
+model_saving:
+  # Number of top-K models to save
+  top_k_models: 5         # Save top 5 models
+                          # 0: Save all models (not recommended, large storage)
+                          # 1: Best model only
+                          # 5-10: Recommended range (Top-K model saving)
+
+  # Optimization metric for model saving
+  optimization_metric: "f1_score"  # Rank by F1 score
+                                    # Must match study.direction
+
+# ==========================================
+# 🧹 Study Management
+# ==========================================
+cleanup:
+  # Automatically delete failed trials
+  auto_delete_failed_trials: true
+
+  # Maximum trials per study limit
+  max_trials_per_study: 20000
+
+  # Save intermediate results flag
+  save_intermediate_results: true
+
+# ==========================================
+# 🔎 Hyperparameter Search Space
+# ==========================================
+optuna_params:
+  # Hidden dimension optimization
+  hidden_dim:
+    type: "int"           # Integer parameter
+    low: 256               # Minimum: Insufficient expressiveness if too small
+    high: 512             # Maximum: Overfitting and high compute cost if too large
+    step: 64              # Step: Try values 64, 80, 96, 112, 128
+
+  # Number of layers optimization
+  num_layers:
+    type: "int"
+    low: 1                # Minimum: At least 1 layer needed
+    high: 4               # Maximum: Gradient vanishing problem if too deep
+    # step not specified: Try 1, 2, 3 with step of 1
+
+  # Dropout ratio optimization
+  dropout_ratio:
+    type: "float"         # Float parameter
+    low: 0.0              # Minimum: 0.0 = No dropout
+    high: 0.3             # Maximum: 0.3 = Disable 30% of neurons
+    step: 0.1             # Step: Try 0.0, 0.1, 0.2, 0.3, 0.4, 0.5
+
+  epochs:
+    type: "int"
+    low: 50               # Minimum: 10 epochs
+    high: 200             # Maximum: 100 epochs
+    step: 5               # Step size
+
+  batch_size:
+    type: "int"
+    low: 64                 # Minimum: 32 (memory saving)
+    high: 256               # Maximum: 128 (stable gradient)
+    step: 64                # Step: Try 16, 32, 48, 64, 80, 96, 112, 128
+
+  learning_rate:
+    type: "float"             # Float parameter
+    low: 1e-4                 # Minimum: Very safe, extremely slow learning
+    high: 1e-3                # Maximum: Common, good balance
+    log: true                 # Search on log scale
+
+  weight_decay:
+    type: "float"   # Float parameter
+    low: 1e-4       # Minimum: Very safe, extremely slow learning
+    high: 1e-2      # Maximum: Common, good balance
+    log: true       # Search on log scale
+
+  # Transformer/Informer specific parameters
+  # Note: These parameters are only used when Transformer/Informer model is selected
+  num_heads:
+    type: "int"
+    low: 2                # Minimum: Basic attention mechanism
+    high: 8               # Maximum: High accuracy but high compute cost
+    step: 2               # Step: Try 2, 4, 6, 8
+                          # Note: hidden_dim % num_heads must == 0
+
+  feedforward_multiplier:
+    type: "int"
+    low: 2                # Minimum: hidden_dim * 2
+    high: 8               # Maximum: hidden_dim * 8
+    step: 2               # Step: Try 2, 4, 6, 8
+                          # FFN dimension = hidden_dim * feedforward_multiplier (auto-calculated)
+
+
+# ==========================================
+# 📈 Expected Performance Ranges
+# ==========================================
+# Empirical rules for ModeDetection task:
+#
+# Accuracy expected range:
+#   - Random: ~25% (4-class classification)
+#   - Simple model: 60-70%
+#   - Optimized: 80-90%
+#   - Theoretical limit: ~95% (sensor noise limit)
+#
+# Optimization effects:
+#   - Initial → Optimized: +10-20% accuracy improvement
+#   - Relationship between trial count and performance:
+#     - 10 trials: Basic optimization
+#     - 20 trials: Recommended range ← Default
+#     - 50 trials: High-accuracy optimization
+#     - 100+ trials: Research level
+
+# ==========================================
+# 🔧 Execution Examples and Parameter Adjustment Guidelines
+# ==========================================
+# Quick test (development):
+#   n_trials: 5
+#   timeout: 300  # 5 minutes
+#
+# Normal optimization (assignment submission):
+#   n_trials: 20  ← Default
+#   timeout: 3600 # 1 hour
+#
+# Full optimization (research):
+#   n_trials: 100
+#   timeout: 10800 # 3 hours

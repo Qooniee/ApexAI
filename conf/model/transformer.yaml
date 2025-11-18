@@ -1,0 +1,50 @@
+# ==============================================
+# Transformer Model Configuration for ApexAI
+# ==============================================
+# Purpose: Transformer model settings for driver classification from race telemetry data
+# Usage: python apexai/trainer_entrypoint.py model=transformer
+
+name: "Transformer"
+type: "Transformer"  # Model type identifier
+
+# ==========================================
+# 📊 Model Architecture
+# ==========================================
+architecture:
+  # Transformer hidden state dimension (d_model)
+  hidden_dim: 128
+
+  # Number of stacked Transformer Encoder layers
+  num_layers: 1
+
+  # Number of Multi-Head Attention heads
+  num_heads: 8
+
+  # Feed Forward Network dimension multiplier
+  # Actual FFN dimension is calculated as hidden_dim * feedforward_multiplier
+  # Standard value: 4 (following Transformer paper. If hidden_dim=128, then FFN=512)
+  feedforward_multiplier: 4
+
+  # Dropout rate (0.0-1.0, for overfitting prevention)
+  dropout_ratio: 0.1
+
+  # Output dimension (must match number of classification classes)
+  out_dim: 21
+
+  # Number of classification classes
+  num_classes: 21
+
+  # Input sequence length
+  seq_len: 100
+
+  # Expected feature dimension
+  feature_size: 9  # pbrake_f, pbrake_r, Steering_Angle, accx_can, accy_can
+
+  # Classification task flag (true: classification, false: regression)
+  classification: true
+
+  # Batch dimension first (PyTorch standard format)
+  batch_first: true
+
+  # Positional encoding settings
+  max_position_embeddings: 512  # Maximum sequence length
