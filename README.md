@@ -68,15 +68,20 @@ AI-powered vehicle identification and race analysis using Toyota GR Cup telemetr
   I recommend referring to pyproject.toml, ruff.toml and .pre-commit-config.yaml.
   Also ApexAI has test and code analysis functions using pytest, ruff, and mypy.
   These procedures are automatically executed when you commit and push.
-  To enable tools for development, you have to install ruff, pre-commit, pytest, pytest-cov, and mypy
+
+  **IMPORTANT: Install the ApexAI package in editable mode (required for `python -m apexai.*` commands)**
+
+  Run the following command **inside the Docker container**:
 
   ```bash
-  uv pip install ruff pre-commit pytest pytest-cov mypy
-  ```
-  or
-  ```bash
+  # Recommended: Install package with development tools
   uv pip install -e .[dev]
   ```
+
+  This command:
+  - Installs the `apexai` package in editable mode (`-e`)
+  - Installs development tools: ruff, pre-commit, pytest, pytest-cov, mypy
+  - Enables `python -m apexai.trainer_entrypoint` and other module-level commands
 ### 4-2. Set up pre-commit hooks
   ```bash
   pre-commit install
