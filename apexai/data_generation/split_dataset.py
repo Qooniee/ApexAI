@@ -169,6 +169,13 @@ def split_and_copy_files(
     stats = {"train": 0, "valid": 0, "test": 0}
     vehicle_stats = {}
 
+    # Create output directories
+    for split in ["train", "valid", "test"]:
+        x_dir = dest_base / split / f"x_{split}"
+        y_dir = dest_base / split / f"y_{split}"
+        x_dir.mkdir(parents=True, exist_ok=True)
+        y_dir.mkdir(parents=True, exist_ok=True)
+
     for vehicle_id, file_pairs in sorted(vehicle_files.items()):
         # Filter last lap if requested
         if filter_last_lap and len(file_pairs) > 1:
