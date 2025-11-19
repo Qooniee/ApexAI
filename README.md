@@ -4,7 +4,23 @@
 [![codecov](https://codecov.io/gh/Qooniee/apexai/branch/main/graph/badge.svg)](https://codecov.io/gh/Qooniee/apexai)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-AI-powered vehicle identification and race analysis using Toyota GR Cup telemetry data.
+## 0. Business Value & Potential Impact
+ApexAI is not just a vehicle classifier; it is a comprehensive AI development platform designed to accelerate TGR's data strategy.
+
+### A. On-Premise & Scalable Architecture
+
+- Privacy First: Designed to run in secure on-premise environments, protecting sensitive telemetry data.
+
+- Ready to Scale: Fully containerized with Docker, allowing seamless migration from a laptop to a cloud cluster when needed.
+
+### B. Beyond Identification: Versatile Applications
+Since ApexAI handles the entire pipeline (AutoML), changing the target label enables various applications:
+
+🏎️ Driver "Fingerprinting" & Training: By learning the driving signature of top drivers, the system can be integrated into driving simulators to provide real-time feedback to trainees (e.g., "Your braking pattern matches Driver A, but steering is Driver B").
+
+⚠️ Real-time Anomaly Detection: In a race, if the predicted Vehicle ID confidence drops suddenly or shifts to an incorrect ID, it serves as an early warning system for mechanical issues or tire degradation.
+
+🔄 Agile Strategy Development: Teams can rapidly generate new models for different circuits or weather conditions simply by swapping datasets, without extensive code modifications.
 
 ## 1. Overview
 
@@ -882,8 +898,8 @@ Time: 12h 00m 45s
 4. **Slice Plot**: Understand parameter-objective relationships
 
 **MLflow UI** (http://localhost:5001):
-- Parent run: `Optuna_ApexAI_NAS_v2`
-- 247 child runs: Individual trials with metrics
+- Parent run: `Optuna_ApexAI_NAS_v2` (Example)
+- 247 child runs: Individual trials with metrics (Example)
 - 5 top model runs: Best models with artifacts
 
 #### 9-3-7. Advanced: Custom BO-NAS Configuration
@@ -1054,13 +1070,13 @@ Epoch [2/100] - Train Loss: 1.8765, Val Loss: 1.7543, Val F1: 0.8123
   The VIR (Virginia International Raceway) dataset used in ApexAI was originally collected with **Kafka streaming infrastructure**:
 
   ```
-  # Original data collection setup (GR86 Cup Race)
+  # Original data collection setup (GR86 Cup Race) (hypothesis)
   CAN Bus (Vehicle) → Kafka Producer → Kafka Topic (telemetry_stream)
                                             ↓
                                 Kafka Consumer → CSV Logger
   ```
 
-  **Why Kafka?**
+  **Why Kafka? (hypothesis)**
   - **Real-time**: Sub-100ms latency from vehicle to processing
   - **Scalability**: Handle 21 vehicles × 10Hz = 210 messages/sec
   - **Reliability**: Message persistence and replay capability
@@ -1667,6 +1683,6 @@ Three real-time plots (updates every 1 second):
 
 This project is developed for the Hack the Track competition.
 
-## Contributors
+## Developer
 
 Qooniee
