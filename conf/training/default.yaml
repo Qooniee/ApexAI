@@ -58,7 +58,7 @@ batch_size: 256            # Small to medium sizes are common for time-series da
                           # Small → Memory saving, noisy gradients
 
 # Training epochs
-epochs: 100                # How many times to train on the entire dataset
+epochs: 10                # How many times to train on the entire dataset
                           # Many → Sufficient learning, overfitting risk
                           # Few → Insufficient learning, underfitting
 

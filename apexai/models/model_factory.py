@@ -10,7 +10,7 @@ from typing import cast
 import torch.nn as nn
 from omegaconf import DictConfig
 
-from models import gru, informer, lstm, transformer
+from apexai.models import gru, informer, lstm, transformer
 
 log = logging.getLogger(__name__)
 
@@ -72,10 +72,10 @@ def create_model(config: DictConfig, feature_size: int, out_dim: int) -> nn.Modu
             nn.Module,
             transformer.TransformerModel(
                 feature_size=feature_size,
-                hidden_size=arch_config.hidden_dim,
+                hidden_dim=arch_config.hidden_dim,
                 num_layers=arch_config.num_layers,
                 num_heads=arch_config.get("num_heads", 8),
-                num_classes=out_dim,
+                out_dim=out_dim,
                 feedforward_multiplier=arch_config.get("feedforward_multiplier", 4),
                 dropout_ratio=arch_config.dropout_ratio,
                 classification=True,

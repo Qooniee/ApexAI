@@ -11,7 +11,8 @@ from torch import nn
 from torch.optim import Optimizer
 from torch.optim.lr_scheduler import LRScheduler
 from torch.utils.data import DataLoader
-from util.tools import get_confusion_matrix, seed_everything
+
+from apexai.util.tools import get_confusion_matrix, seed_everything
 
 from .inference import validation
 from .metrics import TrainingMetrics

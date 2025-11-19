@@ -5,7 +5,7 @@
 defaults:
   - model: gru
   - training: default
-  - optuna: gru_hpo
+  - optuna: nas
   - data: toyota_gr86
   - _self_
 
@@ -13,9 +13,9 @@ defaults:
 # 🎯 EXPERIMENT CONFIGURATION
 # ==========================================
 experiment:
-  name: "ApexAI_Driver_Identification_GRU_Tune"
-  description: "Driver identification from race telemetry data using deep learning"
-  tags: ["time_series", "classification", "apexai", "mlops", "driver_identification"]
+  name: "ApexAI_Vehicle_Identification_NAS"
+  description: "Vehicle identification from race telemetry data using deep learning"
+  tags: ["time_series", "classification", "apexai", "mlops", "vehicle_identification"]
 
 # ==========================================
 # 📊 MLFLOW CONFIGURATION
@@ -30,7 +30,7 @@ mlflow:
   # Auto-tagging settings
   auto_tags:
     project: "ApexAI"
-    platform: "driver_identification"
+    platform: "vehicle_identification"
     data_type: "race_telemetry"
 
 # ==========================================
