@@ -203,10 +203,10 @@ def run_pipeline(
         )
 
         step2_stats["races"][race_name] = gen_stats
-        step2_stats["total_x_files"] += gen_stats.get("num_files_generated", 0)
-        step2_stats["total_y_files"] += gen_stats.get("num_files_generated", 0)
+        step2_stats["total_x_files"] += gen_stats.get("num_laps", 0)
+        step2_stats["total_y_files"] += gen_stats.get("num_laps", 0)
 
-        print(f"    ✓ Generated {gen_stats.get('num_files_generated', 0)} X/y file pairs")
+        print(f"    ✓ Generated {gen_stats.get('num_laps', 0)} X/y file pairs")
 
     pipeline_stats["steps"]["step2_training_files"] = step2_stats
     print(f"\n  ✓ Step 2 complete: {step2_stats['total_x_files']} X/y file pairs\n")

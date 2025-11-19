@@ -4,7 +4,23 @@
 [![codecov](https://codecov.io/gh/Qooniee/apexai/branch/main/graph/badge.svg)](https://codecov.io/gh/Qooniee/apexai)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-AI-powered vehicle identification and race analysis using Toyota GR Cup telemetry data.
+## 0. Business Value & Potential Impact
+ApexAI is not just a vehicle classifier; it is a comprehensive AI development platform designed to accelerate TGR's data strategy.
+
+### A. On-Premise & Scalable Architecture
+
+- Privacy First: Designed to run in secure on-premise environments, protecting sensitive telemetry data.
+
+- Ready to Scale: Fully containerized with Docker, allowing seamless migration from a laptop to a cloud cluster when needed.
+
+### B. Beyond Identification: Versatile Applications
+Since ApexAI handles the entire pipeline (AutoML), changing the target label enables various applications:
+
+🏎️ Driver "Fingerprinting" & Training: By learning the driving signature of top drivers, the system can be integrated into driving simulators to provide real-time feedback to trainees (e.g., "Your braking pattern matches Driver A, but steering is Driver B").
+
+⚠️ Real-time Anomaly Detection: In a race, if the predicted Vehicle ID confidence drops suddenly or shifts to an incorrect ID, it serves as an early warning system for mechanical issues or tire degradation.
+
+🔄 Agile Strategy Development: Teams can rapidly generate new models for different circuits or weather conditions simply by swapping datasets, without extensive code modifications.
 
 ## 1. Overview
 
@@ -65,18 +81,23 @@ AI-powered vehicle identification and race analysis using Toyota GR Cup telemetr
 
 ### 4-1. Setup for development environment
   ApexAI uses uv to manage python environment.
-  I recommend to reffer pyproject.toml, ruff.toml and .pre-commit-config.yaml.
-  Also ApexAI has test and code analysis functions using pytests, ruff, mypy.
-  Those precedures automatically are executed when you commit and push.
-  To enable tools for development, you have to install ruff, pre-commit, pytest, pytest-cov, and mypy
+  I recommend referring to pyproject.toml, ruff.toml and .pre-commit-config.yaml.
+  Also ApexAI has test and code analysis functions using pytest, ruff, and mypy.
+  These procedures are automatically executed when you commit and push.
+
+  **IMPORTANT: Install the ApexAI package in editable mode (required for `python -m apexai.*` commands)**
+
+  Run the following command **inside the Docker container**:
 
   ```bash
-  uv pip install ruff pre-commit pytest pytest-cov mypy
-  ```
-  or
-  ```bash
+  # Recommended: Install package with development tools
   uv pip install -e .[dev]
   ```
+
+  This command:
+  - Installs the `apexai` package in editable mode (`-e`)
+  - Installs development tools: ruff, pre-commit, pytest, pytest-cov, mypy
+  - Enables `python -m apexai.trainer_entrypoint` and other module-level commands
 ### 4-2. Set up pre-commit hooks
   ```bash
   pre-commit install
@@ -145,7 +166,7 @@ AI-powered vehicle identification and race analysis using Toyota GR Cup telemetr
   │   │   └── tools.py              # Common utilities
   │   ├── signal_processing/        # Signal processing utilities
   │   ├── datasets/                 # Legacy dataset utilities
-  │   ├── model_resistory/          # Model repository utilities
+  │   ├── model_repository/         # Model repository utilities
   │   ├── trainer_entrypoint.py     # Single model training entry point
   │   ├── optimization_entrypoint.py # HPO/NAS optimization entry point
   │   └── EDA.ipynb                 # Exploratory data analysis notebook
@@ -236,8 +257,27 @@ AI-powered vehicle identification and race analysis using Toyota GR Cup telemetr
       - gear
       - nmot
       - speed
-  - **Sampling Rate**: ~23Hz. Original sampling rate is converted to 10Hz thorugh preprocessing
+  - **Sampling Rate**: ~23Hz. Original sampling rate is converted to 10Hz through preprocessing
   - **Task**: Multi-class classification of vehicle IDs from time-series telemetry
+
+### 6-1. Dataset Preparation
+
+**Note:** The following commands should be executed inside the Docker container. The `/workspace` directory is mounted from your host machine's project directory (`D:\Development\ApexAI` on Windows, or your local project path on Linux/Mac).
+
+1. Create datasets folder (inside Docker container)
+```bash
+mkdir -p /workspace/datasets/rawdata
+```
+
+2. Access this URL: https://trddev.com/hackathon-2025/
+
+3. Download virginia-international-raceway.zip
+
+4. Extract the zip file (virginia-international-raceway.zip)
+
+5. Copy the VIR folder and place it in `/workspace/datasets/rawdata`
+   - From host machine: Copy to `<project-root>/datasets/rawdata/VIR`
+   - From Docker container: Copy to `/workspace/datasets/rawdata/VIR`
 
 ## 7. Data Pipeline
 
@@ -858,8 +898,8 @@ Time: 12h 00m 45s
 4. **Slice Plot**: Understand parameter-objective relationships
 
 **MLflow UI** (http://localhost:5001):
-- Parent run: `Optuna_ApexAI_NAS_v2`
-- 247 child runs: Individual trials with metrics
+- Parent run: `Optuna_ApexAI_NAS_v2` (Example)
+- 247 child runs: Individual trials with metrics (Example)
 - 5 top model runs: Best models with artifacts
 
 #### 9-3-7. Advanced: Custom BO-NAS Configuration
@@ -1030,13 +1070,13 @@ Epoch [2/100] - Train Loss: 1.8765, Val Loss: 1.7543, Val F1: 0.8123
   The VIR (Virginia International Raceway) dataset used in ApexAI was originally collected with **Kafka streaming infrastructure**:
 
   ```
-  # Original data collection setup (GR86 Cup Race)
+  # Original data collection setup (GR86 Cup Race) (hypothesis)
   CAN Bus (Vehicle) → Kafka Producer → Kafka Topic (telemetry_stream)
                                             ↓
                                 Kafka Consumer → CSV Logger
   ```
 
-  **Why Kafka?**
+  **Why Kafka? (hypothesis)**
   - **Real-time**: Sub-100ms latency from vehicle to processing
   - **Scalability**: Handle 21 vehicles × 10Hz = 210 messages/sec
   - **Reliability**: Message persistence and replay capability
@@ -1643,6 +1683,6 @@ Three real-time plots (updates every 1 second):
 
 This project is developed for the Hack the Track competition.
 
-## Contributors
+## Developer
 
 Qooniee

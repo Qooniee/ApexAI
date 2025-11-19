@@ -8,10 +8,11 @@ import logging
 from typing import Any
 
 import optuna
-from models.model_factory import create_model  # noqa: F401
 from omegaconf import DictConfig, OmegaConf
 from optuna.pruners import HyperbandPruner, MedianPruner
 from optuna.samplers import GridSampler, RandomSampler, TPESampler
+
+from apexai.models.model_factory import create_model  # noqa: F401
 
 log = logging.getLogger(__name__)
 
