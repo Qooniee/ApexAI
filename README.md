@@ -65,9 +65,9 @@ AI-powered vehicle identification and race analysis using Toyota GR Cup telemetr
 
 ### 4-1. Setup for development environment
   ApexAI uses uv to manage python environment.
-  I recommend to reffer pyproject.toml, ruff.toml and .pre-commit-config.yaml.
-  Also ApexAI has test and code analysis functions using pytests, ruff, mypy.
-  Those precedures automatically are executed when you commit and push.
+  I recommend referring to pyproject.toml, ruff.toml and .pre-commit-config.yaml.
+  Also ApexAI has test and code analysis functions using pytest, ruff, and mypy.
+  These procedures are automatically executed when you commit and push.
   To enable tools for development, you have to install ruff, pre-commit, pytest, pytest-cov, and mypy
 
   ```bash
@@ -145,7 +145,7 @@ AI-powered vehicle identification and race analysis using Toyota GR Cup telemetr
   │   │   └── tools.py              # Common utilities
   │   ├── signal_processing/        # Signal processing utilities
   │   ├── datasets/                 # Legacy dataset utilities
-  │   ├── model_resistory/          # Model repository utilities
+  │   ├── model_repository/         # Model repository utilities
   │   ├── trainer_entrypoint.py     # Single model training entry point
   │   ├── optimization_entrypoint.py # HPO/NAS optimization entry point
   │   └── EDA.ipynb                 # Exploratory data analysis notebook
@@ -236,8 +236,27 @@ AI-powered vehicle identification and race analysis using Toyota GR Cup telemetr
       - gear
       - nmot
       - speed
-  - **Sampling Rate**: ~23Hz. Original sampling rate is converted to 10Hz thorugh preprocessing
+  - **Sampling Rate**: ~23Hz. Original sampling rate is converted to 10Hz through preprocessing
   - **Task**: Multi-class classification of vehicle IDs from time-series telemetry
+
+### 6-1. Dataset Preparation
+
+**Note:** The following commands should be executed inside the Docker container. The `/workspace` directory is mounted from your host machine's project directory (`D:\Development\ApexAI` on Windows, or your local project path on Linux/Mac).
+
+1. Create datasets folder (inside Docker container)
+```bash
+mkdir -p /workspace/datasets/rawdata
+```
+
+2. Access this URL: https://trddev.com/hackathon-2025/
+
+3. Download virginia-international-raceway.zip
+
+4. Extract the zip file (virginia-international-raceway.zip)
+
+5. Copy the VIR folder and place it in `/workspace/datasets/rawdata`
+   - From host machine: Copy to `<project-root>/datasets/rawdata/VIR`
+   - From Docker container: Copy to `/workspace/datasets/rawdata/VIR`
 
 ## 7. Data Pipeline
 
