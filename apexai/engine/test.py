@@ -15,7 +15,8 @@ from sklearn.metrics import (
     precision_score,
     recall_score,
 )
-from util.tools import get_confusion_matrix, log_confusion_matrix_to_mlflow
+
+from apexai.util.tools import get_confusion_matrix, log_confusion_matrix_to_mlflow
 
 from .make_graph import testgraph
 

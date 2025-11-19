@@ -15,7 +15,8 @@ from sklearn.metrics import (
     precision_score,
     recall_score,
 )
-from util.tools import get_confusion_matrix
+
+from apexai.util.tools import get_confusion_matrix
 
 if TYPE_CHECKING:
     from omegaconf import DictConfig

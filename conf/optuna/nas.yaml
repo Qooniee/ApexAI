@@ -9,7 +9,7 @@
 # ==========================================
 study:
   # Optimization study name (unique within database)
-  name: "ApexAI_NAS_v2"  # F1 score maximization version
+  name: "ApexAI_NAS_v1"  # F1 score maximization version
 
   # Optimization direction
   direction: "maximize"     # Maximize objective function
