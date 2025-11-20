@@ -1,4 +1,6 @@
-# ApexAI - Vehicle Identification Platform
+# ApexAI: The Integrated AutoML Platform for Race Strategy
+
+## Vehicle Identification Demonstration Project
 
 [![CI](https://github.com/Qooniee/apexai/actions/workflows/ci.yml/badge.svg)](https://github.com/Qooniee/apexai/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/Qooniee/apexai/branch/main/graph/badge.svg)](https://codecov.io/gh/Qooniee/apexai)
@@ -40,10 +42,11 @@ Since ApexAI handles the entire pipeline (AutoML), changing the target label ena
 ## 3. Installation
 ### 3-1. Prerequisites
 
-  - Docker and Docker Compose
-  - NVIDIA GPU with CUDA support
-  - At least 16GB RAM
-  - 10GB free disk space
+  - **Docker** and **Docker Compose** installed
+  - **Visual Studio Code** with **Dev Containers extension** installed
+  - **NVIDIA GPU** with CUDA support (recommended)
+  - **16GB+ RAM** and **10GB free disk space**
+  - **Python 3.11+** (for initial setup script)
 
 ### 3-2. Setup
 
