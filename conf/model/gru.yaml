@@ -1,8 +1,6 @@
-# ==============================================
-# GRU Model Configuration for ModeDetection
-# ==============================================
-# Purpose: GRU model settings for classifying transportation modes from smartphone sensor data
-# Usage: python src/modedetection_main.py model=gru
+# ===============================================================
+# GRU Model Configuration for Vehicle Identification
+# ===============================================================
 
 name: "GRU"
 type: "GRU"  # Model type identifier
