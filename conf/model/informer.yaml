@@ -1,8 +1,7 @@
-# ==============================================
-# Informer Model Configuration for ApexAI
-# ==============================================
-# Purpose: Informer model settings for driver classification from race telemetry data
-# Usage: python apexai/trainer_entrypoint.py model=informer
+# ===============================================================
+# Informer Model Configuration for Vehicle Identification
+# ===============================================================
+
 
 name: "Informer"
 type: "Informer"  # Model type identifier
