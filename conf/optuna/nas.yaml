@@ -1,8 +1,8 @@
-# ==============================================
-# Optuna Optimization Configuration for ModeDetection
-# ==============================================
+# ===============================================================
+# Optuna Optimization Configuration for Vehicle Identification
+# ===============================================================
 # Purpose: Improve model performance through automatic hyperparameter optimization
-# Usage: python src/modedetection_main.py optuna=default
+
 
 # ==========================================
 # 📊 Study Configuration

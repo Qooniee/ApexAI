@@ -1,8 +1,7 @@
-# ==============================================
-# Transformer Model Configuration for ApexAI
-# ==============================================
-# Purpose: Transformer model settings for driver classification from race telemetry data
-# Usage: python apexai/trainer_entrypoint.py model=transformer
+# ===============================================================
+# Transformer Model Configuration for Vehicle Identification
+# ===============================================================
+
 
 name: "Transformer"
 type: "Transformer"  # Model type identifier
