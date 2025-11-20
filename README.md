@@ -1686,6 +1686,10 @@ Three real-time plots (updates every 1 second):
 
 This project is developed for the Hack the Track competition.
 
+## Acknowledgments
+
+This project utilizes numerous open-source libraries. For a complete list of dependencies and their licenses, see [ACKNOWLEDGMENTS.md](ACKNOWLEDGMENTS.md).
+
 ## Developer
 
 Qooniee
