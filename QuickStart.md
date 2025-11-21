@@ -410,11 +410,12 @@ docker-compose down -v
 
 ## Key Features Demonstrated
 
-✅ **AutoML Platform:** Automated data pipeline, training, and optimization
-✅ **MLOps Integration:** MLflow tracking, Optuna optimization, MinIO storage
-✅ **Real-Time Inference:** Streamlit-based simulator with TTA voting
-✅ **Scalable Architecture:** Docker-based deployment ready for production
-✅ **Multiple Models:** GRU, LSTM, Transformer, Informer support
+- ✅ **AutoML Platform:** Automated data pipeline, training, and optimization
+- ✅ **MLOps Integration:** MLflow tracking, Optuna optimization, MinIO storage
+- ✅ **Real-Time Inference:** Streamlit-based simulator with TTA voting
+- ✅ **Scalable Architecture:** Docker-based deployment ready for production
+- ✅ **Multiple Models:** GRU, LSTM, Transformer, Informer support
+
 
 ---
 
