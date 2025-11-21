@@ -1,7 +1,7 @@
 [project]
 name = "apexai"
 version = "0.1.0"
-description = "AI-powered driver training and race analysis using Toyota GR Cup telemetry data"
+description = "ApexAI: The Integrated AutoML Platform for Race Strategy"
 requires-python = ">=3.12"
 dependencies = [
     # Core scientific libraries

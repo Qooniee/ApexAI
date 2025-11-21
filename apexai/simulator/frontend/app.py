@@ -502,7 +502,7 @@ if st.session_state.get("initialized", False):
                     metadata = st.session_state.ensemble_metadata
                     st.write("")
                     agreement_rate = metadata.get("agreement_rate", 0.0)
-                    st.write(f"**Model Agreement:** " f"{agreement_rate*100:.1f}%")
+                    st.write(f"**Model Agreement:** {agreement_rate * 100:.1f}%")
 
                     # <--- Fixed: Use .get() for safe access
                     total_votes = metadata.get("total_votes", "N/A")  # Default value to 'N/A'

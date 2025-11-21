@@ -108,7 +108,7 @@ preprocessing:
       # Values from EDA.ipynb actual data statistics (min and max columns)
       min: [0.0, 0.0, -467.057242, -2.305603, -3.637093, -16.022081, -1.150162, 0.0, 0.0]
       max: [180.869085, 182.249066, 466.393638, 2.481207, 1.924832, 112.747288, 6.083910, 7851.806179, 217.203306]
-    
+
     # Z-Score normalization parameters
     zscore:
       # Set statistics calculated from training data here

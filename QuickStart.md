@@ -6,11 +6,12 @@ This guide provides the minimal steps to launch the platform, run a training dem
 
 ## Prerequisites
 
-- **Docker** and **Docker Compose** installed
-- **Visual Studio Code** with **Dev Containers extension** installed
-- **NVIDIA GPU** with CUDA support (recommended)
-- **16GB+ RAM** and **10GB free disk space**
-- **Python 3.11+** (for initial setup script)
+  - **Windows11** and **WSL2**
+  - **Docker** and **Docker Compose** installed
+  - **Visual Studio Code** with **Dev Containers extension** installed
+  - **NVIDIA GPU** with CUDA support (recommended)
+  - **16GB+ RAM** and **10GB free disk space**
+  - **Python 3.12+** (for initial setup script)
 
 ---
 
@@ -29,16 +30,13 @@ cp .env.template .env
 # Run automated setup (builds containers, initializes databases)
 python setup_apexai.py
 ```
+  This will:
+  - Build Docker images
+  - Initialize PostgreSQL databases (MLflow and Optuna)
+  - Set up MinIO for artifact storage
+  - Verify all services
 
-**Expected output:**
-```
-✓ Docker images built successfully
-✓ PostgreSQL databases initialized
-✓ MLflow tracking server ready
-✓ Optuna dashboard ready
-✓ MinIO storage configured
-✓ All services healthy
-```
+
 
 ---
 

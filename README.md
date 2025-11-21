@@ -30,6 +30,8 @@ Since ApexAI handles the entire pipeline (AutoML), changing the target label ena
   This project is developed for the Hack the Track competition, focusing on vehicle
   classification from time-series sensor data collected during races.
 
+  **Quick Start**: For hands-on demonstration, see [QuickStart.md](QuickStart.md).
+
 ## 2. Features
 
   - **Vehicle Identification**: Classify vehicles from telemetry data (speed, throttle, brake, steering, acceleration)
@@ -42,11 +44,12 @@ Since ApexAI handles the entire pipeline (AutoML), changing the target label ena
 ## 3. Installation
 ### 3-1. Prerequisites
 
+  - **Windows11** and **WSL2**
   - **Docker** and **Docker Compose** installed
   - **Visual Studio Code** with **Dev Containers extension** installed
   - **NVIDIA GPU** with CUDA support (recommended)
   - **16GB+ RAM** and **10GB free disk space**
-  - **Python 3.11+** (for initial setup script)
+  - **Python 3.12+** (for initial setup script)
 
 ### 3-2. Setup
 
@@ -75,7 +78,6 @@ Since ApexAI handles the entire pipeline (AutoML), changing the target label ena
   - **Optuna Dashboard**: http://localhost:8081
   - **MinIO Console**: http://localhost:9020
   - **pgAdmin**: http://localhost:5051
-  - **Jupyter Lab**: http://localhost:8889
   - **Streamlit**: http://localhost:8501
 
   Username and password are written in the .env file
