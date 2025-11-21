@@ -1,0 +1,22 @@
+codecov:
+  require_ci_to_pass: yes
+
+coverage:
+  status:
+    project:
+      default:
+        # Informational only, won't block CI
+        informational: true
+    patch:
+      default:
+        # New code coverage is also informational only
+        informational: true
+
+comment:
+  layout: "reach,diff,flags,tree"
+  behavior: default
+
+ignore:
+  - "tests/"
+  - "docs/"
+  - "*.md"
