@@ -478,20 +478,6 @@ def main():
     print("  🎯 Optuna Dashboard: http://localhost:8081")
     print("  🗄️ MinIO Console:    http://localhost:9020")
     print("  💾 pgAdmin:          http://localhost:5051")
-    print("\n🚀 Run ApexAI Experiment:")
-    print(
-        "  docker exec apexai_predictor bash -c \"cd /workspace && python src/apexai_main.py experiment.name='ApexAI_First_Test'\""
-    )
-    print("\n📊 Data Location:")
-    print("  datasets/hack_the_track/ - Race telemetry data")
-    print("\n⚙️  Configuration:")
-    print("  conf/config.yaml - Main configuration")
-    print("  .env - Environment variables")
-    print("\n📖 Next Steps:")
-    print("  1. Verify all services are accessible via web browsers")
-    print("  2. Run a test experiment to confirm everything works")
-    print("  3. Check MLflow UI to see experiment results")
-    print("  4. Use Optuna Dashboard to monitor hyperparameter optimization")
 
 
 if __name__ == "__main__":
