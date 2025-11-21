@@ -318,7 +318,7 @@ Open these URLs in your browser:
 |---------|-----|---------|
 | **MLflow UI** | http://localhost:5001 | View training runs, metrics, and models |
 | **Optuna Dashboard** | http://localhost:8081 | Hyperparameter optimization visualization |
-| **MinIO Console** | http://localhost:9020 | Model artifact storage (login: minioadmin/minioadmin) |
+| **MinIO Console** | http://localhost:9020 | Model artifact storage (login: Refer to the `.env` file.) |
 | **Streamlit Simulator** | http://localhost:8501 | Real-time inference demo |
 
 **MLflow UI Quick Check:**
