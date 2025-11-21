@@ -61,7 +61,13 @@ python setup_apexai.py
 1. Visit: https://trddev.com/hackathon-2025/
 2. Download: `virginia-international-raceway.zip`
 3. Extract the ZIP file
-4. Copy the `VIR` folder to: `<ApexAI-project-root>/datasets/rawdata/VIR`
+4. Create datasets folder (inside Docker container)
+
+```bash
+mkdir -p /workspace/datasets/rawdata
+```
+
+5. Copy the `VIR` folder to: `<ApexAI-project-root>/datasets/rawdata/VIR`
 
 **Verify in VS Code terminal** (inside container):
 
@@ -210,7 +216,7 @@ Final dataset ready at: datasets/drivingdatasets/input
 
 ---
 
-## Step 5: Quick Training Demo
+## Step 5a: Quick Training Demo
 
 **In VS Code terminal:**
 
@@ -271,6 +277,39 @@ Will assume defaults for version 1.1
 
 ---
 
+## Step 5b: Quick Hyperparameter Optimization Demo
+
+**In VS Code terminal:**
+
+```bash
+/workspace# python -m apexai.optimization_entrypoint \
+  model=gru \
+  optuna=gru_hpo \
+  optuna.optimization.n_trials=5 \
+  training.epochs=5 \
+  optuna.optimization.timeout=300 \
+  optuna.study.name="ApexAI_HPO_Test_GRU"
+```
+
+**Expected output:**
+```
+[I 2025-11-21 00:15:23,456] A new study created in RDB with name: ApexAI_HPO_Test_GRU
+[I 2025-11-21 00:15:30,123] Trial 0 finished with value: 0.0523 and parameters: {'hidden_size': 128, 'num_layers': 3, 'dropout': 0.2}
+[I 2025-11-21 00:15:45,789] Trial 1 finished with value: 0.0687 and parameters: {'hidden_size': 256, 'num_layers': 4, 'dropout': 0.3}
+[I 2025-11-21 00:16:01,234] Trial 2 finished with value: 0.0612 and parameters: {'hidden_size': 192, 'num_layers': 3, 'dropout': 0.25}
+[I 2025-11-21 00:16:16,567] Trial 3 finished with value: 0.0698 and parameters: {'hidden_size': 256, 'num_layers': 2, 'dropout': 0.15}
+[I 2025-11-21 00:16:32,890] Trial 4 finished with value: 0.0734 and parameters: {'hidden_size': 320, 'num_layers': 4, 'dropout': 0.35}
+[I 2025-11-21 00:16:33,000] Best trial: Trial 4 with value: 0.0734
+```
+
+**What happened:**
+- Optuna automatically tested 5 different hyperparameter combinations
+- Each trial trained a GRU model for 5 epochs
+- Results are logged to both MLflow and Optuna database
+- Best parameters are automatically identified
+
+---
+
 ## Step 6: Access Dashboards
 
 Open these URLs in your browser:
@@ -284,10 +323,19 @@ Open these URLs in your browser:
 
 **MLflow UI Quick Check:**
 1. Navigate to "Experiments"
-2. Find your recent run (model=gru, epochs=5)
-3. Check the overview, model metrics, and artifacts
+2. Find your recent runs:
+   - Single training run (Step 5a): model=gru, epochs=5
+   - HPO trials (Step 5b): 5 optimization trials
+3. Compare metrics across different trials
 4. View the confusion matrix in "Artifacts"
 5. View logged models in the Overview tab
+
+**Optuna Dashboard Quick Check:**
+1. Navigate to http://localhost:8081
+2. Find study: "ApexAI_HPO_Test_GRU"
+3. View optimization history (5 trials)
+4. Check parameter importance chart
+5. See best hyperparameter combination
 
 ---
 
@@ -323,15 +371,6 @@ Open these URLs in your browser:
 ## Step 8 (Optional): Advanced Features
 
 **In VS Code terminal:**
-
-### Hyperparameter Optimization
-
-```bash
-python -m apexai.optimization_entrypoint \
-  model=gru \
-  optuna=gru_hpo
-```
-
 ### Neural Architecture Search
 
 ```bash
@@ -346,8 +385,10 @@ python -m apexai.optimization_entrypoint optuna=nas
 - [ ] VS Code opened in Dev Container
 - [ ] Dataset downloaded to `datasets/rawdata/VIR`
 - [ ] Data pipeline generated train/valid/test splits
-- [ ] Quick training completed (5 epochs)
+- [ ] Quick training completed (Step 5a: 5 epochs)
+- [ ] HPO demo completed (Step 5b: 5 trials)
 - [ ] MLflow UI shows training metrics at http://localhost:5001
+- [ ] Optuna Dashboard shows HPO results at http://localhost:8081
 - [ ] Streamlit simulator running at http://localhost:8501
 
 ---
