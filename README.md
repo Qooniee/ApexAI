@@ -203,6 +203,7 @@ Since ApexAI handles the entire pipeline (AutoML), changing the target label ena
   │   └── Dockerfile                # Main container definition
   │
   ├── init_scripts/                 # Infrastructure initialization
+  |   ├── apexai_startup_check.py   # Startup health check script
   │   ├── setup_database.py         # PostgreSQL setup
   │   ├── setup_mlflow_db.py        # MLflow database setup
   │   ├── setup_optuna.py           # Optuna study initialization
@@ -210,8 +211,6 @@ Since ApexAI handles the entire pipeline (AutoML), changing the target label ena
   │   ├── environment_check.py      # Environment validation
   │   ├── gpu_check.py              # GPU availability check
   │   ├── health_check.py           # Service health monitoring
-  │   ├── test_experiment.py        # MLflow experiment test
-  │   ├── test_modedetection_integration.py  # Integration test
   │   ├── 01-create-databases.sh    # Database creation script
   │   └── wait_for_databases.sh     # Database readiness check
   │
@@ -237,7 +236,6 @@ Since ApexAI handles the entire pipeline (AutoML), changing the target label ena
   ├── LICENSE                       # Apache 2.0 License
   ├── README.md                     # This documentation
   ├── setup_apexai.py               # One-click infrastructure setup
-  ├── apexai_startup_check.py       # Startup health check script
   └── analyze_abnormal_laps.py      # Lap anomaly detection utility
 
   ```
